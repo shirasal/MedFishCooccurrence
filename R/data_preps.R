@@ -28,6 +28,9 @@ med_clean_east <- medata %>%
          prod = as.vector(scale(pp_mean))) %>%
     select(site, lon, lat, trans, species, sp.n, mpa, temp, depth, prod)
 
+write_rds(med_clean, "data/processed/med_clean.rds")
+write_rds(med_clean_east, "data/processed/med_clean_east.rds")
+
 # Create assisting vectors ------------------------------------------------
 
 # Guilds
