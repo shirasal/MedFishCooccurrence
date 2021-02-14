@@ -43,3 +43,20 @@ patch_plot
 ggsave(filename = "figures/rel_imp_pois_nonspat.png", device = "png", 
        dpi = 150, height = 10, width = 10, units = "in")
 
+
+### Nonstationarity -------------------------------------------------------
+
+all_relimp <- list(grps = grps_pois_relimp,
+                   dip = dip_pois_relimp,
+                   herb = herb_pois_relimp)
+
+# Compare stationary and nonstationary effects:
+lapply(all_relimp, function(x){
+x %>% 
+  pivot_longer(2:6, names_to = "type", values_to = "rel_imp") %>% 
+  mutate(nonstationary = str_detect(type, "_bio_")) %>% 
+  group_by(species, nonstationary) %>% 
+  summarise(sum = sum(rel_imp)) %>% 
+  group_by(nonstationary) %>% 
+  summarise(mean(sum))
+})
