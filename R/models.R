@@ -15,6 +15,9 @@ grps_pois <- MRFcov(grps_mat, n_nodes = 4, family = "poisson")
 dip_pois <- MRFcov(dip_mat, n_nodes = 4, family = "poisson")
 herb_pois <- MRFcov(herb_mat, n_nodes = 4, family = "poisson")
 
+
+## Relative importance ----------------------------------------------------
+
 grps_pois_relimp <- rel_imp_sum(grps_pois)
 dip_pois_relimp <- rel_imp_sum(dip_pois)
 herb_pois_relimp <- rel_imp_sum(herb_pois)
@@ -39,3 +42,4 @@ patch_plot[[3]] <- patch_plot[[3]] + theme(axis.title.y = element_blank())
 patch_plot
 ggsave(filename = "figures/rel_imp_pois_nonspat.png", device = "png", 
        dpi = 150, height = 10, width = 10, units = "in")
+
