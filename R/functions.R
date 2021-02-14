@@ -44,30 +44,30 @@ rel_imp_sum <- function(guild_mod){
     left_join(mpa_bio_relimp, by = "species")
 }
 
-# ### Plot relative importance of covariates by covariate for each species, within guild:
-# plot_relimp <- function(rel_imp_df, col, guild_name){
-#   rel_imp_df %>% 
-#     pivot_longer(2:length(.)) %>% 
-#     rename(species = species, covariate = name, rel_imp = value) %>%
-#     mutate(covariate = str_remove(string = covariate, pattern = "_rel_imp")) %>% 
-#     mutate(facet.title = case_when(covariate == "env" ~ "Environment",
-#                                    covariate == "anthro" ~ "MPA",
-#                                    covariate == "biotic" ~ "Biotic Associations",
-#                                    covariate == "env_bio" ~ "Temp * Biotic",
-#                                    covariate == "mpa_bio" ~ "MPA * Biotic")) %>% 
-#     mutate(facet.title = fct_relevel(facet.title, 
-#                                      "Environment", "MPA", "Biotic Associations",
-#                                      "Temp * Biotic", "MPA * Biotic")) %>% 
-#     ggplot() +
-#     aes(x = species, y = rel_imp) +
-#     stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = col) +
-#     facet_wrap(~facet.title, nrow = 1) +
-#     labs(subtitle = guild_name) +
-#     theme(axis.text.x = element_text(angle = 45, hjust = 1), strip.placement = "outside",
-#           axis.title.x = element_blank(), axis.title.y = element_blank(),
-#           strip.text.x = element_text(size = 12, face = "bold"),
-#           plot.margin = margin(.2,1,.2,1, "cm"))
-# }
+### Plot relative importance of covariates by covariate for each species, within guild:
+plot_relimp <- function(rel_imp_df, guild_col, guild_name){
+  rel_imp_df %>%
+    pivot_longer(2:length(.)) %>%
+    rename(covariate = name, rel_imp = value) %>%
+    mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
+    mutate(facet.title = case_when(covariate == "env_rel_imp" ~ "Environment",
+                                   covariate == "mpa_rel_imp" ~ "MPA",
+                                   covariate == "biotic_rel_imp" ~ "Biotic Associations",
+                                   covariate == "env_bio_rel_imp" ~ "Temp * Biotic",
+                                   covariate == "mpa_bio_rel_imp" ~ "MPA * Biotic")) %>%
+    mutate(facet.title = fct_relevel(facet.title,
+                                     "Environment", "MPA", "Biotic Associations",
+                                     "Temp * Biotic", "MPA * Biotic")) %>%
+    ggplot() +
+    aes(x = species, y = rel_imp) +
+    stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = guild_colours[[guild_col]]) +
+    facet_wrap(~facet.title, nrow = 1) +
+    labs(subtitle = guild_name, y = "Relative Importance (prop.)") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "italic"), strip.placement = "outside",
+          axis.title.x = element_blank(), 
+          strip.text.x = element_text(size = 12, face = "bold"),
+          plot.margin = margin(.2,1,.2,1, "cm"))
+}
 # 
 # 
 # 
