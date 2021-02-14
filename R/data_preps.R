@@ -101,3 +101,9 @@ write_csv(locations_removed, "issues/locations_removed.csv")
 write_rds(grps_mat, "data/processed/grps_mat.rds")
 write_rds(dip_mat, "data/processed/dip_mat.rds")
 write_rds(herb_mat, "data/processed/herb_mat.rds")
+
+
+# Graphics ----------------------------------------------------------------
+
+guild_colours <- list(grps = "#c54607", dip = "#145d82", herb = "#43aa8b")
+write_rds(guild_colours, "data/processed/guild_colours.rds")
