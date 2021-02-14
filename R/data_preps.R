@@ -68,6 +68,8 @@ grps_mat <- create_spp_mat(dataset = med_clean, guild = groupers, covariate = al
 dip_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, covariate = all_covs)
 herb_mat <- create_spp_mat(dataset = med_clean_east, guild = herbivores, covariate = all_covs)
 
+
+# Remove NAs --------------------------------------------------------------
 # Remove NAs, but keep track of what was removed:
 grps_NAs <- grps_mat %>% as_tibble(rownames = NA) %>% rownames_to_column("ID") %>% 
   filter(is.na(temp) | is.na(depth) | is.na(prod) | is.na(mpa)) %>% 
@@ -87,7 +89,10 @@ herb_NAs <- herb_mat %>% as_tibble(rownames = NA) %>% rownames_to_column("ID") %
 nrow(dip_NAs) # 529 observations removed from analysis due to missing information
 herb_mat %<>% filter(!is.na(temp), !is.na(depth), !is.na(prod), !is.na(mpa))
 
-setdiff(grps_NAs, dip_NAs, herb_NAs)
+setdiff(grps_NAs, dip_NAs, herb_NAs) # They're all the same, so I can just keep one
 
 locations_removed <- grps_NAs %>% distinct()
 rm(grps_NAs, dip_NAs, herb_NAs)
+
+# Export this list of removed locations:
+write_csv(locations_removed, "issues/locations_removed.csv")
