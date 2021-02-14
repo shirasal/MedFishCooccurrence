@@ -96,3 +96,8 @@ rm(grps_NAs, dip_NAs, herb_NAs)
 
 # Export this list of removed locations:
 write_csv(locations_removed, "issues/locations_removed.csv")
+
+# Export species matrices
+write_rds(grps_mat, "data/processed/grps_mat.rds")
+write_rds(dip_mat, "data/processed/dip_mat.rds")
+write_rds(herb_mat, "data/processed/herb_mat.rds")
