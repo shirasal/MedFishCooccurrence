@@ -2,6 +2,10 @@
 source("R/packages.R")
 source("R/functions.R")
 
+env_cov <- read_rds("data/all_covs.rds")[1:3]
+mpa_cov <- read_rds("data/all_covs.rds")[4]
+guild_colours <- read_rds("data/processed/guild_colours.rds")
+
 matrices <- list("data/processed/grps_mat.rds",
               "data/processed/dip_mat.rds",
               "data/processed/herb_mat.rds")
@@ -11,24 +15,22 @@ names(species_mats) <- c("grps_mat", "dip_mat", "herb_mat")
 
 # Nonspatial Poisson CRF --------------------------------------------------
 
-grps_pois <- MRFcov(grps_mat, n_nodes = 4, family = "poisson")
-dip_pois <- MRFcov(dip_mat, n_nodes = 4, family = "poisson")
-herb_pois <- MRFcov(herb_mat, n_nodes = 4, family = "poisson")
+poisson_models <- lapply(species_mats, function(x){MRFcov(x, n_nodes = 4, family = "poisson")})
+names(poisson_models) <- c("grps_pois", "dip_pois", "herb_pois")
 
 
 ## Relative importance ----------------------------------------------------
 
-grps_pois_relimp <- rel_imp_sum(grps_pois)
-dip_pois_relimp <- rel_imp_sum(dip_pois)
-herb_pois_relimp <- rel_imp_sum(herb_pois)
+pois_relimp <- lapply(poisson_models, rel_imp_sum)
+names(pois_relimp) <- c("grps_pois_relimp", "dip_pois_relimp", "herb_pois_relimp")
 
-p_relimp_grps_pois <- plot_relimp(grps_pois_relimp, "grps", "Groupers")
+p_relimp_grps_pois <- plot_relimp(pois_relimp$grps_pois_relimp, "grps", "Groupers")
 ggsave(plot = p_relimp_grps_pois, filename = "figures/relimp_grps_pois_nonspat.png", device = "png", 
        dpi = 300, width = 11.74, height = 4, units = "in")
-p_relimp_dip_pois <- plot_relimp(dip_pois_relimp, "dip", "Seabreams")
+p_relimp_dip_pois <- plot_relimp(pois_relimp$dip_pois_relimp, "dip", "Seabreams")
 ggsave(plot = p_relimp_dip_pois, filename = "figures/relimp_dip_pois_nonspat.png", device = "png", 
        dpi = 300, width = 11.74, height = 4, units = "in")
-p_relimp_herb_pois <- plot_relimp(herb_pois_relimp, "herb", "Herbivores")
+p_relimp_herb_pois <- plot_relimp(pois_relimp$herb_pois_relimp, "herb", "Herbivores")
 ggsave(plot = p_relimp_herb_pois, filename = "figures/relimp_herb_pois_nonspat.png", device = "png", 
        dpi = 300, width = 11.74, height = 4, units = "in")
 
