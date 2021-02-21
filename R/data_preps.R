@@ -62,6 +62,7 @@ create_spp_mat <- function(dataset, guild, covariate){
 
 # Combine covariate vectors:
 all_covs <- c(env_cov, mpa_cov)
+write_rds(all_covs, "data/all_covs.rds")
 
 # Create matrices for each guild:
 grps_mat <- create_spp_mat(dataset = med_clean, guild = groupers, covariate = all_covs)
