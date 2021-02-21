@@ -14,13 +14,13 @@ species_mats <- lapply(matrices, read_rds)
 names(species_mats) <- c("grps_mat", "dip_mat", "herb_mat")
 
 grps_pa <- species_mats$grps_mat
-grps_pa[1:4] <- ifelse(grps_pa[1:4] > 0, 1, 0)
+grps_pa[,1:4] <- ifelse(grps_pa[,1:4] > 0, 1, 0)
 
 dip_pa <- species_mats$dip_mat
-dip_pa[1:4] <- ifelse(dip_pa[1:4] > 0, 1, 0)
+dip_pa[,1:4] <- ifelse(dip_pa[,1:4] > 0, 1, 0)
 
 herb_pa <- species_mats$herb_mat
-herb_pa[1:4] <- ifelse(herb_pa[1:4] > 0, 1, 0)
+herb_pa[,1:4] <- ifelse(herb_pa[,1:4] > 0, 1, 0)
 
 # Nonspatial Binomial CRF -------------------------------------------------
 
