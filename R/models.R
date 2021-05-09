@@ -48,9 +48,9 @@ patch_plot
 
 ### Nonstationarity -------------------------------------------------------
 
-all_relimp <- list(grps = grps_pois_relimp,
-                   dip = dip_pois_relimp,
-                   herb = herb_pois_relimp)
+all_relimp <- list(grps = pois_relimp$grps_pois_relimp,
+                   dip = pois_relimp$dip_pois_relimp,
+                   herb = pois_relimp$herb_pois_relimp)
 
 # Compare stationary and nonstationary effects:
 lapply(all_relimp, function(x){
