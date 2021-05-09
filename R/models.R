@@ -60,5 +60,5 @@ x %>%
   group_by(species, nonstationary) %>% 
   summarise(sum = sum(rel_imp)) %>% 
   group_by(nonstationary) %>% 
-  summarise(mean(sum))
+  summarise(mean_RI = mean(sum))
 })
