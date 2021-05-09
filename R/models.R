@@ -25,14 +25,14 @@ pois_relimp <- lapply(poisson_models, rel_imp_sum)
 names(pois_relimp) <- c("grps_pois_relimp", "dip_pois_relimp", "herb_pois_relimp")
 
 p_relimp_grps_pois <- plot_relimp(pois_relimp$grps_pois_relimp, "grps", "Groupers")
-ggsave(plot = p_relimp_grps_pois, filename = "figures/relimp_grps_pois_nonspat.png", device = "png", 
-       dpi = 300, width = 11.74, height = 4, units = "in")
+# ggsave(plot = p_relimp_grps_pois, filename = "figures/relimp_grps_pois_nonspat.png", device = "png", 
+#        dpi = 300, width = 11.74, height = 4, units = "in")
 p_relimp_dip_pois <- plot_relimp(pois_relimp$dip_pois_relimp, "dip", "Seabreams")
-ggsave(plot = p_relimp_dip_pois, filename = "figures/relimp_dip_pois_nonspat.png", device = "png", 
-       dpi = 300, width = 11.74, height = 4, units = "in")
+# ggsave(plot = p_relimp_dip_pois, filename = "figures/relimp_dip_pois_nonspat.png", device = "png", 
+#        dpi = 300, width = 11.74, height = 4, units = "in")
 p_relimp_herb_pois <- plot_relimp(pois_relimp$herb_pois_relimp, "herb", "Herbivores")
-ggsave(plot = p_relimp_herb_pois, filename = "figures/relimp_herb_pois_nonspat.png", device = "png", 
-       dpi = 300, width = 11.74, height = 4, units = "in")
+# ggsave(plot = p_relimp_herb_pois, filename = "figures/relimp_herb_pois_nonspat.png", device = "png", 
+#        dpi = 300, width = 11.74, height = 4, units = "in")
 
 
 patch_plot <- p_relimp_grps_pois / p_relimp_dip_pois / p_relimp_herb_pois
@@ -42,8 +42,8 @@ patch_plot[[2]] <- patch_plot[[2]] + theme(axis.title.y = element_text(size = 14
 patch_plot[[3]] <- patch_plot[[3]] + theme(axis.title.y = element_blank())
 
 patch_plot
-ggsave(filename = "figures/rel_imp_pois_nonspat.png", device = "png", 
-       dpi = 150, height = 10, width = 10, units = "in")
+# ggsave(filename = "figures/rel_imp_pois_nonspat.png", device = "png", 
+#        dpi = 150, height = 10, width = 10, units = "in")
 
 
 ### Nonstationarity -------------------------------------------------------
