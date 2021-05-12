@@ -18,6 +18,7 @@ plot_graph <- function(guild_mod, plot_title){
     geom_node_point(aes(size = deg), col = "grey", alpha = 0.5) +
     geom_node_text(aes(label = str_replace(name, "\\.", "\\ ")), repel = TRUE, check_overlap = TRUE, 
                    point.padding = unit(0.2, "lines"), fontface = "italic") +
+    ggtitle(plot_title) +
     theme(legend.position = "none",
           aspect.ratio = 1,
           panel.background = element_blank())
