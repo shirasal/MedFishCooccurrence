@@ -7,8 +7,8 @@ mpa_cov <- read_rds("data/all_covs.rds")[4]
 guild_colours <- read_rds("data/processed/guild_colours.rds")
 
 matrices <- list("data/processed/grps_mat.rds",
-              "data/processed/dip_mat.rds",
-              "data/processed/herb_mat.rds")
+                 "data/processed/dip_mat.rds",
+                 "data/processed/herb_mat.rds")
 
 species_mats <- lapply(matrices, read_rds)
 names(species_mats) <- c("grps_mat", "dip_mat", "herb_mat")
@@ -24,16 +24,16 @@ names(poisson_models) <- c("grps_pois", "dip_pois", "herb_pois")
 pois_relimp <- lapply(poisson_models, rel_imp_sum)
 names(pois_relimp) <- c("grps_pois_relimp", "dip_pois_relimp", "herb_pois_relimp")
 
-p_relimp_grps_pois <- plot_relimp(pois_relimp$grps_pois_relimp, "grps", "Groupers")
-# ggsave(plot = p_relimp_grps_pois, filename = "figures/relimp_grps_pois_nonspat.png", device = "png", 
-#        dpi = 300, width = 11.74, height = 4, units = "in")
-p_relimp_dip_pois <- plot_relimp(pois_relimp$dip_pois_relimp, "dip", "Seabreams")
-# ggsave(plot = p_relimp_dip_pois, filename = "figures/relimp_dip_pois_nonspat.png", device = "png", 
-#        dpi = 300, width = 11.74, height = 4, units = "in")
-p_relimp_herb_pois <- plot_relimp(pois_relimp$herb_pois_relimp, "herb", "Herbivores")
-# ggsave(plot = p_relimp_herb_pois, filename = "figures/relimp_herb_pois_nonspat.png", device = "png", 
-#        dpi = 300, width = 11.74, height = 4, units = "in")
+p_relimp_grps_pois <- pois_relimp$grps_pois_relimp %>% select(-`NA`) %>% plot_relimp("grps", "Groupers")
+p_relimp_dip_pois <- pois_relimp$dip_pois_relimp %>% select(-`NA`) %>% plot_relimp("dip", "Seabreams")
+p_relimp_herb_pois <- pois_relimp$herb_pois_relimp %>% select(-`NA`) %>% plot_relimp("herb", "Herbivores")
 
+# ggsave(plot = p_relimp_grps_pois, filename = "figures/relimp_grps_pois_nonspat.png", device = "png",
+#        dpi = 300, width = 11.74, height = 4, units = "in")
+# ggsave(plot = p_relimp_dip_pois, filename = "figures/relimp_dip_pois_nonspat.png", device = "png",
+#        dpi = 300, width = 11.74, height = 4, units = "in")
+# ggsave(plot = p_relimp_herb_pois, filename = "figures/relimp_herb_pois_nonspat.png", device = "png",
+#        dpi = 300, width = 11.74, height = 4, units = "in")
 
 patch_plot <- p_relimp_grps_pois / p_relimp_dip_pois / p_relimp_herb_pois
 # Remove y axis titles from first and third subplots and enlarge the middle one's
@@ -42,11 +42,11 @@ patch_plot[[2]] <- patch_plot[[2]] + theme(axis.title.y = element_text(size = 14
 patch_plot[[3]] <- patch_plot[[3]] + theme(axis.title.y = element_blank())
 
 patch_plot
-# ggsave(filename = "figures/rel_imp_pois_nonspat.png", device = "png", 
+# ggsave("figures/rel_imp_pois_nonspat.png", device = "png", 
 #        dpi = 150, height = 10, width = 10, units = "in")
 
 
-### Nonstationarity -------------------------------------------------------
+## Nonstationarity -------------------------------------------------------
 
 all_relimp <- list(grps = pois_relimp$grps_pois_relimp,
                    dip = pois_relimp$dip_pois_relimp,
@@ -54,11 +54,38 @@ all_relimp <- list(grps = pois_relimp$grps_pois_relimp,
 
 # Compare stationary and nonstationary effects:
 lapply(all_relimp, function(x){
-x %>% 
-  pivot_longer(2:6, names_to = "type", values_to = "rel_imp") %>% 
-  mutate(nonstationary = str_detect(type, "_bio_")) %>% 
-  group_by(species, nonstationary) %>% 
-  summarise(sum = sum(rel_imp)) %>% 
-  group_by(nonstationary) %>% 
-  summarise(mean_RI = mean(sum))
+  x %>% 
+    pivot_longer(2:ncol(.), names_to = "type", values_to = "rel_imp") %>% 
+    mutate(nonstationary = str_detect(type, "_bio")) %>% 
+    group_by(species, nonstationary) %>% 
+    na.omit() %>% 
+    summarise(sum = sum(rel_imp)) %>% 
+    group_by(nonstationary) %>% 
+    summarise(mean_RI = mean(sum))
 })
+
+
+# Biomass models ----------------------------------------------------------
+
+matrices_mass <- list("data/processed/grps_mass_mat.rds",
+                      "data/processed/dip_mass_mat.rds",
+                      "data/processed/herb_mass_mat.rds")
+
+species_mats_mass <- lapply(matrices_mass, read_rds)
+names(species_mats_mass) <- c("grps_mass_mat", "dip_mass_mat", "herb_mass_mat")
+
+biomass_models <- lapply(species_mats_mass, function(x){MRFcov(x, n_nodes = 4, family = "gaussian")})
+names(biomass_models) <- c("grps_mass", "dip_mass", "herb_mass")
+
+biomass_models$grps_mass$direct_coefs
+
+## Relative importance ----------------------------------------------------
+
+mass_relimp <- lapply(biomass_models, rel_imp_sum)
+names(mass_relimp) <- c("grps_mass_relimp", "dip_mass_relimp", "herb_mass_relimp")
+
+mass_relimp$grps_mass_relimp
+mass_relimp$dip_mass_relimp
+mass_relimp$herb_mass_relimp
+
+
