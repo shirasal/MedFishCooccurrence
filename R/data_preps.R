@@ -64,7 +64,7 @@ create_spp_mat <- function(dataset, guild, metric, covariate){
   } else if(metric == "biomass") {
     dataset %>%
       group_by_at(.vars = cols) %>%
-      summarise(n = sum(biomass), .groups = "drop") %>% 
+      summarise(n = log(sum(biomass)+1), .groups = "drop") %>% 
       spread(species, n, fill = 0) %>% 
       # Add unique rownames that describe the site and transect:
       mutate(loc = paste(site, trans)) %>% 
