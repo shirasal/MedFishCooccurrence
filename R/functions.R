@@ -19,18 +19,19 @@ rel_imp_sum <- function(guild_mod){
 
 ### Plot relative importance of covariates by covariate for each species, within guild:
 plot_relimp <- function(rel_imp_df, guild_col, guild_name){
+  # Tibble for the facet names and their order:
+  cov_titles <- tibble(covariate = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
+                       facet.title = factor(c("Environment", "MPA", "Biotic Associations",
+                                              "Temp * Biotic", "MPA * Biotic"),
+                                            levels = c("Environment", "MPA", "Biotic Associations",
+                                                       "Temp * Biotic", "MPA * Biotic")))
+  # Organise data
   rel_imp_df %>%
     pivot_longer(2:length(.)) %>%
     rename(covariate = name, rel_imp = value) %>%
     mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
-    mutate(facet.title = case_when(covariate == "env" ~ "Environment",
-                                   covariate == "mpa" ~ "MPA",
-                                   covariate == "bio" ~ "Biotic Associations",
-                                   covariate == "temp_bio" ~ "Temp * Biotic",
-                                   covariate == "mpa_bio" ~ "MPA * Biotic")) %>%
-    mutate(facet.title = fct_relevel(facet.title,
-                                     "Environment", "MPA", "Biotic Associations",
-                                     "Temp * Biotic", "MPA * Biotic")) %>%
+    right_join(cov_titles, by = "covariate") %>% 
+    # Plot:
     ggplot() +
     aes(x = species, y = rel_imp) +
     stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = guild_colours[[guild_col]]) +
