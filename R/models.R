@@ -98,11 +98,11 @@ p_relimp_grps_mass <- mass_relimp$grps_mass_relimp %>% plot_relimp("grps", "Grou
 p_relimp_dip_mass <- mass_relimp$dip_mass_relimp %>% select(-`NA`) %>% 
   pivot_longer(2:length(.)) %>%
   rename(covariate = name, rel_imp = value) %>%
-  mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
   right_join(cov_titles, by = "covariate") %>% 
   add_row(species = diplodus, covariate = "temp_bio", rel_imp = NA, facet.title = factor("Temp * Biotic",
           levels = c("Environment", "MPA", "Biotic Associations",
-                     "Temp * Biotic", "MPA * Biotic"))) %>%  
+                     "Temp * Biotic", "MPA * Biotic"))) %>% 
+  mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
   filter(!is.na(species)) %>% 
   # Plot:
   ggplot() +
