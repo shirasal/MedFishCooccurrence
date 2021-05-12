@@ -48,31 +48,47 @@ mpa_cov <- "mpa"
 # Create species matrix (for MRFcov) --------------------------------------
 
 # Define function
-create_spp_mat <- function(dataset, guild, covariate){
+create_spp_mat <- function(dataset, guild, metric, covariate){
   cols <- c(c("lat", "lon", "site", "trans", "species"), env_cov, mpa_cov)
-  dataset %>%
-    group_by_at(.vars = cols) %>%
-    summarise(n = sum(sp.n), .groups = "drop") %>% 
-    spread(species, n, fill = 0) %>% 
-    # Add unique rownames that describe the site and transect:
-    mutate(loc = paste(site, trans)) %>% 
-    group_by(loc) %>%
-    column_to_rownames("loc") %>% 
-    select(all_of(guild), all_of(covariate)) %>% 
-    ungroup()
+  if (metric == "sp.n" | metric == "abundance") {
+    dataset %>% 
+      group_by_at(.vars = cols) %>%
+      summarise(n = sum(sp.n), .groups = "drop") %>% 
+      spread(species, n, fill = 0) %>% 
+      # Add unique rownames that describe the site and transect:
+      mutate(loc = paste(site, trans)) %>% 
+      group_by(loc) %>%
+      column_to_rownames("loc") %>% 
+      select(all_of(guild), all_of(covariate)) %>% 
+      ungroup()
+  } else if(metric == "biomass") {
+    dataset %>%
+      group_by_at(.vars = cols) %>%
+      summarise(n = sum(biomass), .groups = "drop") %>% 
+      spread(species, n, fill = 0) %>% 
+      # Add unique rownames that describe the site and transect:
+      mutate(loc = paste(site, trans)) %>% 
+      group_by(loc) %>%
+      column_to_rownames("loc") %>% 
+      select(all_of(guild), all_of(covariate)) %>% 
+      ungroup()  
+  } else {
+    stop("Metric should be either 'sp.n', 'abundance' or 'biomass'")
+  }
 }
 
 # Combine covariate vectors:
 all_covs <- c(env_cov, mpa_cov)
 write_rds(all_covs, "data/all_covs.rds")
 
-# Create matrices for each guild:
-grps_mat <- create_spp_mat(dataset = med_clean, guild = groupers, covariate = all_covs)
-dip_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, covariate = all_covs)
-herb_mat <- create_spp_mat(dataset = med_clean_east, guild = herbivores, covariate = all_covs)
 
+## Abundance matrices ------------------------------------------------------
 
-# Remove NAs --------------------------------------------------------------
+grps_mat <- create_spp_mat(dataset = med_clean, guild = groupers, metric = "sp.n", covariate = all_covs)
+dip_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, metric = "sp.n", covariate = all_covs)
+herb_mat <- create_spp_mat(dataset = med_clean_east, guild = herbivores, metric = "sp.n", covariate = all_covs)
+
+### Remove NAs -------------------------------------------------------------
 # Remove NAs, but keep track of what was removed:
 grps_NAs <- grps_mat %>% as_tibble(rownames = NA) %>% rownames_to_column("ID") %>% 
   filter(is.na(temp) | is.na(depth) | is.na(prod) | is.na(mpa)) %>% 
@@ -105,6 +121,41 @@ write_rds(grps_mat, "data/processed/grps_mat.rds")
 write_rds(dip_mat, "data/processed/dip_mat.rds")
 write_rds(herb_mat, "data/processed/herb_mat.rds")
 
+## Biomass matrices ------------------------------------------------------
+
+grps_mass_mat <- create_spp_mat(dataset = med_clean, guild = groupers, metric = "biomass", covariate = all_covs)
+dip_mass_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, metric = "biomass", covariate = all_covs)
+herb_mass_mat <- create_spp_mat(dataset = med_clean_east, guild = herbivores, metric = "biomass", covariate = all_covs)
+
+### Remove NAs -------------------------------------------------------------
+# Remove NAs, but keep track of what was removed:
+grps_NAs <- grps_mass_mat %>% as_tibble(rownames = NA) %>% rownames_to_column("ID") %>% 
+  filter(is.na(temp) | is.na(depth) | is.na(prod) | is.na(mpa)) %>% 
+  select(ID, all_of(all_covs))
+nrow(grps_NAs) # 529 observations removed from analysis due to missing information
+grps_mass_mat %<>% filter(!is.na(temp), !is.na(depth), !is.na(prod), !is.na(mpa))
+
+dip_NAs <- dip_mass_mat %>% as_tibble(rownames = NA) %>% rownames_to_column("ID") %>% 
+  filter(is.na(temp) | is.na(depth) | is.na(prod) | is.na(mpa)) %>% 
+  select(ID, all_of(all_covs))
+nrow(dip_NAs) # 529 observations removed from analysis due to missing information
+dip_mass_mat %<>% filter(!is.na(temp), !is.na(depth), !is.na(prod), !is.na(mpa))
+
+herb_NAs <- herb_mass_mat %>% as_tibble(rownames = NA) %>% rownames_to_column("ID") %>% 
+  filter(is.na(temp) | is.na(depth) | is.na(prod) | is.na(mpa)) %>% 
+  select(ID, all_of(all_covs))
+nrow(dip_NAs) # 529 observations removed from analysis due to missing information
+herb_mass_mat %<>% filter(!is.na(temp), !is.na(depth), !is.na(prod), !is.na(mpa))
+
+setdiff(setdiff(grps_NAs, dip_NAs, herb_NAs), locations_removed) 
+# They're all the same, so I can just keep the one from before
+
+rm(grps_NAs, dip_NAs, herb_NAs)
+
+# Export species matrices
+write_rds(grps_mass_mat, "data/processed/grps_mass_mat.rds")
+write_rds(dip_mass_mat, "data/processed/dip_mass_mat.rds")
+write_rds(herb_mass_mat, "data/processed/herb_mass_mat.rds")
 
 # Graphics ----------------------------------------------------------------
 
