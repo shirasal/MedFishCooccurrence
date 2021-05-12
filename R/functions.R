@@ -2,46 +2,19 @@
 
 ### Summarise the relative importance of each type of covariate for each species
 rel_imp_sum <- function(guild_mod){
-  env_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>%  # Take the taxa model and apply the following:
-                         filter(Variable %in% env_cov) %>%  # Filter by relevant covariates
-                         summarise(n = sum(Rel_importance))) %>% # Summarise Rel_importance column
-    unlist() %>% # Take out of the list
-    enframe(name = "species", value = "env_rel_imp") %>%  # Rearrange
-    mutate(species = str_sub(string = species, end = -3)) # Fix species names
-  
-  mpa_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>% 
-                            filter(Variable %in% mpa_cov) %>%
-                            summarise(n = sum(Rel_importance))) %>% 
-    unlist() %>%
-    enframe(name = "species", value = "mpa_rel_imp") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  biotic_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>% 
-                            filter(!(Variable %in% env_cov | Variable %in% mpa_cov | str_detect(string = Variable, pattern = "_"))) %>%
-                            summarise(n = sum(Rel_importance))) %>% 
-    unlist() %>%
-    enframe(name = "species", value = "biotic_rel_imp") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  env_bio_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>% 
-                             filter(str_detect(string = Variable, pattern = "temp_")) %>% 
-                             summarise(n = sum(Rel_importance))) %>% 
-    unlist() %>%
-    enframe(name = "species", value = "env_bio_rel_imp") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  mpa_bio_relimp <- sapply(guild_mod$key_coefs, FUN = function(x) x %>% 
-                                filter(str_detect(string = Variable, pattern = "mpa_")) %>% 
-                                summarise(n = sum(Rel_importance))) %>% 
-    unlist() %>%
-    enframe(name = "species", value = "mpa_bio_rel_imp") %>% 
-    mutate(species = str_sub(string = species, end = -3))
-  
-  env_relimp %>%
-    left_join(mpa_relimp, by = "species") %>%
-    left_join(biotic_relimp, by = "species") %>%
-    left_join(env_bio_relimp, by = "species") %>%
-    left_join(mpa_bio_relimp, by = "species")
+  lapply(guild_mod$key_coefs, function(x) {
+    if (nrow(x) == 0) return(tibble(cov_type = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
+                                    sum_rel_imp = 0))
+    x %>% 
+      mutate(cov_type = case_when(Variable %in% env_cov ~ "env",
+                                  Variable %in% mpa_cov ~ "mpa",
+                                  !(Variable %in% env_cov | Variable %in% mpa_cov | str_detect(string = Variable, pattern = "_")) ~ "bio",
+                                  str_detect(string = Variable, pattern = "temp_") ~ "temp_bio",
+                                  str_detect(string = Variable, pattern = "mpa_") ~ "mpa_bio")) %>% 
+      group_by(cov_type) %>%  # Filter by relevant covariates
+      summarise(sum_rel_imp = sum(Rel_importance))}) %>% # Summarise Rel_importance column
+    bind_rows(.id = "species") %>% 
+    pivot_wider(id_cols = species, names_from = cov_type, values_from = sum_rel_imp)
 }
 
 ### Plot relative importance of covariates by covariate for each species, within guild:
@@ -50,11 +23,11 @@ plot_relimp <- function(rel_imp_df, guild_col, guild_name){
     pivot_longer(2:length(.)) %>%
     rename(covariate = name, rel_imp = value) %>%
     mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
-    mutate(facet.title = case_when(covariate == "env_rel_imp" ~ "Environment",
-                                   covariate == "mpa_rel_imp" ~ "MPA",
-                                   covariate == "biotic_rel_imp" ~ "Biotic Associations",
-                                   covariate == "env_bio_rel_imp" ~ "Temp * Biotic",
-                                   covariate == "mpa_bio_rel_imp" ~ "MPA * Biotic")) %>%
+    mutate(facet.title = case_when(covariate == "env" ~ "Environment",
+                                   covariate == "mpa" ~ "MPA",
+                                   covariate == "bio" ~ "Biotic Associations",
+                                   covariate == "temp_bio" ~ "Temp * Biotic",
+                                   covariate == "mpa_bio" ~ "MPA * Biotic")) %>%
     mutate(facet.title = fct_relevel(facet.title,
                                      "Environment", "MPA", "Biotic Associations",
                                      "Temp * Biotic", "MPA * Biotic")) %>%
