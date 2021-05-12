@@ -68,249 +68,140 @@ plot_relimp <- function(rel_imp_df, guild_col, guild_name){
           strip.text.x = element_text(size = 12, face = "bold"),
           plot.margin = margin(.2,1,.2,1, "cm"))
 }
-# 
-# 
-# 
-# 
-# ### MPA predictions visualisation
-# vis_mpa_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
-#   # Create a vector of all other species except species_j
-#   all_other_species <- guild[-which(guild == species_j)]
-#   
-#   # Scenario 1: species_j is absent, other species are at their mean abundance
-#   set.seed(10)
-#   j_abs <- spp_mat %>% 
-#     mutate(temp = median(temp),
-#            depth = median(depth),
-#            prod = median(prod),
-#            across(all_of(species_j), .fns = function(x) 0),
-#            across(all_of(all_other_species), .fns = mean)) %>% 
-#     group_by(mpa) %>% 
-#     sample_n(1) %>% 
-#     ungroup()
-#   # Scenario 2: species_j is at its 90th percentile abundance, other species are at their mean abundance
-#   set.seed(10)
-#   j_max <- spp_mat %>% 
-#     mutate(temp = median(temp),
-#            depth = median(depth),
-#            prod = median(prod),
-#            across(.cols = all_of(species_j), .fns = function(x) quantile(x, 0.9)),
-#            across(all_of(all_other_species), .fns = mean)) %>% 
-#     group_by(mpa) %>% 
-#     sample_n(1) %>% 
-#     ungroup()
-#   
-#   # Create predictions
-#   ## For when species j is absent
-#   predict_abs <- predict_MRF(j_abs, spp_mod) %>% 
-#     `colnames<-`(guild) %>% 
-#     as_data_frame() %>% 
-#     mutate(mpa = j_abs$mpa)
-#   ## For when species j is absent
-#   predict_max <- predict_MRF(j_max, spp_mod) %>% 
-#     `colnames<-`(guild) %>% 
-#     as_data_frame() %>% 
-#     mutate(mpa = j_max$mpa)
-#   
-#   # Put the two scenarios together
-#   mpa_predict <- bind_rows(predict_abs, predict_max, .id = "scenario") %>% 
-#     mutate(scenario = case_when(scenario == 1 ~ "absent",
-#                                 scenario == 2 ~ "present"))
-#   
-#   # Visualise the predictions
-#   ## Create a dataframe with all the predictions, sorted by scenario
-#   predictions_mpa <- mpa_predict %>% 
-#     pivot_longer(cols = all_of(2:5),
-#                  names_to = "species",
-#                  values_to = "prediction", 
-#                  names_repair = "minimal")
-#   
-#   ## Plot the predictions:
-#   predictions_mpa %>%
-#     filter(species == species_i) %>% 
-#     ggplot() +
-#     aes(x = mpa, y = prediction, fill = scenario) +
-#     stat_summary(geom = "bar", fun = "mean", position = "dodge") +
-#     stat_summary(geom = "errorbar", fun.data = "mean_se", position = position_dodge(width = 0.8), width = 0.2) +
-#     xlab("MPA") + ylab("Observation predictions (nonparanormal)") +
-#     labs(subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
-#          fill = stringr::str_replace(species_j, "\\.", "\\ ")) +
-#     scale_fill_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
-#     theme(legend.title = element_text(face = "bold.italic"), plot.subtitle = element_text(face = "bold.italic"))
-# }
-# 
-# ### Temperature predictions visualisation
-# vis_temp_pred_pair <- function(species_i, species_j, spp_mat, spp_mod, guild){
-#   # Create a vector of all other species except species_j
-#   all_other_species <- guild[-which(guild == species_j)]
-#   
-#   # Scenario 1: species_j is absent, other species are at their mean abundance
-#   set.seed(10)
-#   j_abs <- spp_mat %>% 
-#     mutate(depth = median(depth),
-#            prod = median(prod),
-#            mpa = TRUE,
-#            temperature = spp_mat$temp * attr(spp_mat$temp, 'scaled:scale') + attr(spp_mat$temp, 'scaled:center'),
-#            across(.cols = all_of(species_j), .funs = function(x) 0),
-#            across(.cols = all_of(all_other_species), .fns = mean)) %>% 
-#     group_by(temperature = round(temperature, digits = 1)) %>% 
-#     sample_n(1) %>%  
-#     ungroup() %>% 
-#     mutate(temp = scale(temperature))
-#   # Scenario 2: species_j is at its 90th percentile abundance, other species are at their mean abundance
-#   set.seed(10)
-#   j_max <- spp_mat %>% 
-#     mutate(depth = median(depth),
-#            prod = median(prod),
-#            mpa = TRUE,
-#            temperature = spp_mat$temp * attr(spp_mat$temp, 'scaled:scale') + attr(spp_mat$temp, 'scaled:center'),
-#            across(.cols = all_of(species_j), .funs = quantile(species_j, 0.9)),
-#            across(.cols = all_of(all_other_species), .fns = mean)) %>% 
-#     group_by(temperature = round(temperature, digits = 1)) %>% 
-#     sample_n(1) %>%  
-#     ungroup() %>% 
-#     mutate(temp = scale(temperature))
-#   
-#   # Create predictions
-#   ## For when species j is absent
-#   predict_abs <- predict_MRF(j_abs, spp_mod) %>% 
-#     `colnames<-`(guild) %>% 
-#     as_data_frame() %>% 
-#     mutate(temp = j_abs$temperature)
-#   ## For when species j is absent
-#   predict_max <- predict_MRF(j_max, spp_mod) %>% 
-#     `colnames<-`(guild) %>% 
-#     as_data_frame() %>% 
-#     mutate(temp = j_max$temperature)
-#   
-#   # Put the two scenarios together
-#   temp_predict <- bind_rows(predict_abs, predict_max, .id = "scenario") %>% 
-#     mutate(scenario = case_when(scenario == 1 ~ "absent",
-#                                 scenario == 2 ~ "present"))
-#   
-#   # Visualise the predictions
-#   ## Create a dataframe with all the predictions, sorted by scenario
-#   predictions_temp <- temp_predict %>% 
-#     pivot_longer(cols = all_of(2:5),
-#                  names_to = "species",
-#                  values_to = "prediction", 
-#                  names_repair = "minimal")
-#   
-#   ## Plot the predictions:
-#   predictions_temp %>%
-#     filter(species == species_i) %>% 
-#     ggplot() +
-#     aes(x = temp, y = prediction, col = scenario) +
-#     geom_smooth(method = "lm", formula = y ~ x, cex = 3, alpha = 0.1) +
-#     xlab(paste("Temperature", "(°C)")) + ylab("Observations prediction") +
-#     labs(subtitle = stringr::str_replace(species_i, "\\.", "\\ "),
-#          col = stringr::str_replace(species_j, "\\.", "\\ ")) +
-#     scale_color_manual(labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
-#     theme(legend.title = element_text(face = "bold.italic"), plot.subtitle = element_text(face = "bold.italic"))
-# }
-# 
-# ### Temperature raw data visualisation
-# vis_raw_temp <- function(spp_mat, species_i, species_j) {
-#   spp_mat %>% 
-#     mutate(scenario = if_else(spp_mat[[species_j]] == 0, "absent", "present"),
-#            Temperature = spp_mat$temp * attr(spp_mat$temp, 'scaled:scale') + attr(spp_mat$temp, 'scaled:center')) %>% 
-#     ggplot() +
-#     aes(x = Temperature, y = log2(spp_mat[[species_i]] + 0.1), group = scenario) +
-#     geom_point(aes(colour = scenario), alpha = 0.1) +
-#     stat_smooth(aes(colour = scenario), method = "gam", alpha = 0.3) +
-#     xlab("Temperature (°C)") + ylab("Abundance (nonparanormal)") +
-#     ggtitle(str_replace(species_i, "\\.", "\\ ")) +
-#     scale_color_manual(name = str_replace(species_j, "\\.", "\\ "),
-#                        labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
-#     theme(plot.title = element_text(face = "bold.italic"),
-#           legend.title = element_text(face = "bold.italic"))
-# }
-# 
-# ### MPA raw data visualisation
-# vis_raw_mpa <- function(spp_mat, species_i, species_j){
-#   spp_mat %>% 
-#     mutate(scenario = if_else(spp_mat[[species_j]] == 0, "absent", "present")) %>% 
-#     ggplot() +
-#     aes(x = mpa, y = log2(spp_mat[[species_i]] + 0.1), group = scenario) +
-#     geom_boxplot(aes(colour = scenario), fill = "ghostwhite") +
-#     xlab("MPA") + ylab("Observations prediction") +
-#     ggtitle(str_replace(species_i, "\\.", "\\ ")) +
-#     scale_color_manual(name = str_replace(species_j, "\\.", "\\ "), 
-#                        labels = c('Absent','Present'), values = c("#031D44", "#FF99C9")) +
-#     theme(plot.title = element_text(face = "bold.italic"),
-#           legend.title = element_text(face = "bold.italic"))
-# }
-# 
-# 
-# 
-# 
-# ### Summarise coefficients for each species, separating positive from negative
-# coefs_sum <- function(guild_mod, guild){
-#   env_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
-#                          filter(Variable %in% env_cov) %>%
-#                          group_by(Standardised_coef > 0) %>% 
-#                          summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
-#                          transmute(direction = `Standardised_coef > 0`, env_coef = coefs) %>%
-#                          mutate(direction = case_when(.$direction == TRUE ~ "pos",
-#                                                       .$direction == FALSE ~ "neg",
-#                                                       TRUE ~ as.character(.$direction)))) %>% 
-#     bind_rows(.id = "id")
-#   
-#   temp_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
-#                           filter(Variable == "temp") %>%
-#                           group_by(Standardised_coef > 0) %>% 
-#                           summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
-#                           transmute(direction = `Standardised_coef > 0`, temp_coef = coefs) %>%
-#                           mutate(direction = case_when(.$direction == TRUE ~ "pos",
-#                                                        .$direction == FALSE ~ "neg",
-#                                                        TRUE ~ as.character(.$direction)))) %>% 
-#     bind_rows(.id = "id")
-#   
-#   anthro_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
-#                             filter(Variable %in% mpa_cov) %>%
-#                             group_by(Standardised_coef > 0) %>% 
-#                             summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
-#                             transmute(direction = `Standardised_coef > 0`, mpa_coef = coefs) %>%
-#                             mutate(direction = case_when(.$direction == TRUE ~ "pos",
-#                                                          .$direction == FALSE ~ "neg",
-#                                                          TRUE ~ as.character(.$direction)))) %>% 
-#     bind_rows(.id = "id")
-#   
-#   
-#   biotic_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
-#                             filter(Variable %in% colnames(guild_mod$graph)) %>%
-#                             group_by(Standardised_coef > 0) %>% 
-#                             summarise(coefs = sum(Standardised_coef), .groups = "drop") %>% 
-#                             transmute(direction = `Standardised_coef > 0`, bio_coef = coefs) %>%
-#                             mutate(direction = case_when(.$direction == TRUE ~ "pos",
-#                                                          .$direction == FALSE ~ "neg",
-#                                                          TRUE ~ as.character(.$direction)))) %>% 
-#     bind_rows(.id = "id")
-#   
-#   env_bio_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
-#                              filter(str_detect(string = Variable, pattern = "temp_")) %>%
-#                              group_by(Standardised_coef > 0) %>% 
-#                              summarise(coefs = sum(Standardised_coef), .groups = "drop") %>%
-#                              transmute(direction = `Standardised_coef > 0`, bio_env_coef = coefs) %>%
-#                              mutate(direction = case_when(.$direction == TRUE ~ "pos",
-#                                                           .$direction == FALSE ~ "neg",
-#                                                           TRUE ~ as.character(.$direction)))) %>%
-#     bind_rows(.id = "id")
-#   
-#   anthro_bio_effect <- lapply(guild_mod$key_coefs, FUN = function(x) x %>%
-#                                 filter(str_detect(string = Variable, pattern = "mpa_")) %>%
-#                                 group_by(Standardised_coef > 0) %>% 
-#                                 summarise(coefs = sum(Standardised_coef), .groups = "drop") %>%
-#                                 transmute(direction = `Standardised_coef > 0`, bio_mpa_coef = coefs) %>%
-#                                 mutate(direction = case_when(.$direction == TRUE ~ "pos",
-#                                                              .$direction == FALSE ~ "neg",
-#                                                              TRUE ~ as.character(.$direction)))) %>%
-#     bind_rows(.id = "id")
-#   
-#   
-#   bind_rows(env_effect, temp_effect, anthro_effect, biotic_effect, 
-#             env_bio_effect, anthro_bio_effect) %>% 
-#     arrange(direction, id) %>% 
-#     rename(species = id)
-# }
-# 
+
+### Plot overall (mean) networks
+plot_graph <- function(guild_mod, plot_title){
+  net_cols <- c(neg = '#FF3333', pos = '#3399CC')
+  net <- igraph::graph.adjacency(guild_mod$graph, weighted = T, mode = "undirected")
+  weights <- igraph::E(net)$weight
+  deg <- igraph::degree(net, mode = "all")
+  ggraph(net, layout = "circle") + 
+    geom_edge_link(aes(width = weights, color = weights < 0), lineend = "round", linejoin = "round") +
+    scale_edge_width(range = c(0, 3)) +
+    scale_edge_color_manual(values = c(net_cols[["pos"]], net_cols[["neg"]])) +
+    geom_node_point(aes(size = deg), col = "grey", alpha = 0.5) +
+    geom_node_text(aes(label = str_replace(name, "\\.", "\\ ")), repel = TRUE, check_overlap = TRUE, 
+                   point.padding = unit(0.2, "lines"), fontface = "italic") +
+    ggtitle(plot_title) +
+    theme(legend.position = "none",
+          aspect.ratio = 1,
+          panel.background = element_blank())
+}
+
+### Plot networks for temperature gradient (continuous)
+plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate){
+  #### Function to create network graphs
+  create_netgraph  <- function(matrix, node_names, predictor_value){
+    
+    # Create the adjacency network graph
+    comm.net <- igraph::graph.adjacency(matrix, weighted = T, mode = "undirected")
+    # Specify edge colours
+    cols <- c(neg = "#FF3333", pos = "#3399CC")
+    
+    igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
+                                        cols[["neg"]],
+                                        cols[["pos"]])
+    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight*20)
+    igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
+    igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
+    
+    # Create the network plot
+    net.plot <- plot(comm.net,
+                     layout = igraph::layout.circle,
+                     vertex.label.cex = 1.2,
+                     vertex.frame.color = grDevices::adjustcolor("grey", alpha.f = .6),
+                     vertex.shape = "circle",
+                     vertex.label.family = "sans",
+                     vertex.label.font = 3,
+                     vertex.label.color = "black")
+    return(net.plot)
+  }
+  
+  interaction_coefficients <- MRF_mod$graph
+  
+  #### Specify default parameter settings ####
+  dimnames(interaction_coefficients) <- list(node_names, node_names)
+  
+  #### Extract indirect effect matrix that matches the covariate name ####
+  indirect_coef_names <- names(MRF_mod$indirect_coefs)
+  which_matrix_keep <- grepl(covariate, indirect_coef_names)
+  covariate_matrix <- MRF_mod$indirect_coefs[which_matrix_keep]
+  covariate_matrix <- as.matrix(covariate_matrix[[1]][[1]])
+  baseinteraction_matrix <- as.matrix(MRF_mod$graph)
+  
+  #### Extract quantiles of observed values for the covariate ####
+  observed_cov_values <- as.vector(data[[paste(covariate)]])
+  observed_cov_quantiles <- quantile(observed_cov_values,
+                                     probs = c(0, 0.5, 1), na.rm = T)
+  
+  #If number of unique values is low, quantiles may be identical. Instead,
+  #generate a sequence of 10 simulated values from the observed min to the observed max
+  if(length(unique(observed_cov_quantiles)) < 3){
+    observed_cov_quantiles <- quantile(seq(min(observed_cov_values),
+                                           max(observed_cov_values),
+                                           length.out = 10),
+                                       probs = c(0, 0.5, 1), na.rm = T)
+  }
+  
+  #### Create a gridded plot object to plot the three networks
+  graphics::par(mfrow = c(1, length(observed_cov_quantiles)), mar = c(0,3,0,3))
+  cont.cov.mats <- lapply(observed_cov_quantiles, function(j){
+    pred_values <- (covariate_matrix * j) + baseinteraction_matrix
+    net.plot <- create_netgraph(matrix = pred_values, node_names = node_names, predictor_value = j)
+  })
+}
+
+### Plot networks for MPA (factor)
+plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate){
+  #### Function to create network graphs
+  create_netgraph  <- function(matrix, node_names, predictor_value){
+    
+    # Create the adjacency network graph
+    comm.net <- igraph::graph.adjacency(matrix, weighted = T, mode = "undirected")
+    # Specify edge colours
+    cols <- c(neg = "#FF3333", pos = "#3399CC")
+    
+    igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
+                                        cols[["neg"]],
+                                        cols[["pos"]])
+    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight*20)
+    igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
+    igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
+    
+    # Create the network plot
+    # graphics::par(mar = c(0,3,0,3))
+    net.plot <- plot(comm.net,
+                     layout = igraph::layout.circle,
+                     vertex.label.cex = 1.2,
+                     vertex.frame.color = grDevices::adjustcolor("grey", alpha.f = .6),
+                     vertex.shape = "circle",
+                     vertex.label.family = "sans",
+                     vertex.label.font = 3,
+                     vertex.label.color = "black",
+                     main = predictor_value)
+    return(net.plot)
+  }
+  
+  interaction_coefficients <- MRF_mod$graph
+  
+  #### Specify default parameter settings ####
+  dimnames(interaction_coefficients) <- list(node_names, node_names)
+  
+  #### Extract indirect effect matrix that matches the covariate name ####
+  indirect_coef_names <- names(MRF_mod$indirect_coefs)
+  which_matrix_keep <- grepl(covariate, indirect_coef_names)
+  covariate_matrix <- MRF_mod$indirect_coefs[which_matrix_keep]
+  covariate_matrix <- as.matrix(covariate_matrix[[1]][[1]])
+  baseinteraction_matrix <- as.matrix(MRF_mod$graph)
+  
+  #### Extract quantiles of observed values for the covariate ####
+  observed_cov_values <- as.vector(data[[paste(covariate)]])
+  observed_cov_unique <- as.numeric(unique(observed_cov_values, na.rm = T))
+  
+  #### Create a gridded plot object to plot the three networks
+  graphics::par(mfrow = c(1, length(observed_cov_unique)), mar = c(1,3,1,3))
+  cont.cov.mats <- lapply(observed_cov_unique, function(j){
+    pred_values <- (covariate_matrix * j) + baseinteraction_matrix
+    net.plot <- create_netgraph(matrix = pred_values, node_names = node_names, predictor_value = as.logical(j))
+  })
+}
