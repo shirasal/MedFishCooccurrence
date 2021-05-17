@@ -45,6 +45,8 @@ patch_plot
 # ggsave("figures/rel_imp_pois_nonspat.png", device = "png", 
 #        dpi = 150, height = 10, width = 10, units = "in")
 
+# ggsave("figures/rel_imp_pois_nonspat.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
+
 
 ## Nonstationarity -------------------------------------------------------
 
@@ -154,4 +156,5 @@ patch_plot_mass
 # ggsave("figures/rel_imp_mass.png", device = "png",
 #        dpi = 150, height = 10, width = 10, units = "in")
 
+# ggsave("figures/rel_imp_mass.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
 
