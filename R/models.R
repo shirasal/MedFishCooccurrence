@@ -98,7 +98,7 @@ p_relimp_grps_mass <- mass_relimp$grps_mass_relimp %>%
   pivot_longer(2:length(.)) %>%
   rename(covariate = name, rel_imp = value) %>%
   right_join(cov_titles, by = "covariate") %>% 
-  add_row(species = groupers, covariate = "temp_bio", rel_imp = NA, 
+  add_row(species = colnames(species_mats_mass$grps_mass_mat[1:4]), covariate = "temp_bio", rel_imp = NA, 
           facet.title = factor("Temp * Biotic",
                                levels = c("Environment", "MPA", "Biotic Associations",
                                           "Temp * Biotic", "MPA * Biotic"))) %>% 
@@ -119,8 +119,7 @@ p_relimp_dip_mass <- mass_relimp$dip_mass_relimp %>% select(-`NA`) %>%
   pivot_longer(2:length(.)) %>%
   rename(covariate = name, rel_imp = value) %>%
   right_join(cov_titles, by = "covariate") %>% 
-  add_row(species = diplodus, covariate = "temp_bio", rel_imp = NA, 
-          facet.title = factor("Temp * Biotic",
+  add_row(species = colnames(species_mats_mass$dip_mass_mat[1:4]), covariate = "temp_bio", rel_imp = NA,           facet.title = factor("Temp * Biotic",
                                levels = c("Environment", "MPA", "Biotic Associations",
                                           "Temp * Biotic", "MPA * Biotic"))) %>% 
   mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
@@ -135,6 +134,7 @@ p_relimp_dip_mass <- mass_relimp$dip_mass_relimp %>% select(-`NA`) %>%
         axis.title.x = element_blank(), 
         strip.text.x = element_text(size = 12, face = "bold"),
         plot.margin = margin(.2,1,.2,1, "cm"))
+
 p_relimp_herb_mass <- mass_relimp$herb_mass_relimp %>% select(-`NA`) %>% plot_relimp("herb", "Herbivores")
 
 # ggsave(plot = p_relimp_grps_mass, filename = "figures/relimp_grps_mass.png", device = "png",
