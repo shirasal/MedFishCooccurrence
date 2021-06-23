@@ -23,32 +23,32 @@ guilds <- list(groupers = colnames(species_mats$grps_mat)[1:4],
 
 ## Temperature networks for Poisson models ---------------------------------
 
-png(filename = "figures/groupers_net_temp.png", res = 150, width = 12, height = 3.7, units = "in")
+# png(filename = "figures/groupers_net_temp.png", res = 150, width = 12, height = 3.7, units = "in")
 plotMRF_net_cont(species_mats$grps_mat, poisson_models$grps_pois, node_names = guilds$groupers, covariate = "temp")
-dev.off()
+# dev.off()
 
-png(filename = "figures/seabreams_net_temp.png", res = 150, width = 12, height = 3.7, units = "in")
+# png(filename = "figures/seabreams_net_temp.png", res = 150, width = 12, height = 3.7, units = "in")
 plotMRF_net_cont(species_mats$dip_mat, poisson_models$dip_pois, node_names = guilds$diplodus, covariate = "temp")
-dev.off()
+# dev.off()
 
-png(filename = "figures/herbivores_net_temp.png", res = 150, width = 12, height = 3.7, units = "in")
+# png(filename = "figures/herbivores_net_temp.png", res = 150, width = 12, height = 3.7, units = "in")
 plotMRF_net_cont(species_mats$herb_mat, poisson_models$herb_pois, node_names = guilds$herbivores, covariate = "temp")
-dev.off()
+# dev.off()
 
 
 ## MPA networks for Poisson models -----------------------------------------
 
-png(filename = "figures/groupers_net_mpa.png", res = 150, width = 13, height = 7.38, units = "in")
+# png(filename = "figures/groupers_net_mpa.png", res = 150, width = 13, height = 7.38, units = "in")
 plotMRF_net_factor(species_mats$grps_mat, poisson_models$grps_pois, guilds$grouper, covariate = "mpa")
-dev.off()
+# dev.off()
 
-png(filename = "figures/seabreams_net_mpa.png", res = 150, width = 13, height = 7.38, units = "in")
+# png(filename = "figures/seabreams_net_mpa.png", res = 150, width = 13, height = 7.38, units = "in")
 plotMRF_net_factor(species_mats$dip_mat, poisson_models$dip_pois, guilds$diplodus, covariate = "mpa")
-dev.off()
+# dev.off()
 
-png(filename = "figures/herbivores_net_mpa.png", res = 150, width = 13, height = 7.38, units = "in")
+# png(filename = "figures/herbivores_net_mpa.png", res = 150, width = 13, height = 7.38, units = "in")
 plotMRF_net_factor(species_mats$herb_mat, poisson_models$herb_pois, guilds$herbivores, covariate = "mpa")
-dev.off()
+# dev.off()
 
 
 # Biomass network gradients ------------------------------------------------
@@ -67,29 +67,29 @@ plot_graph(biomass_models$herb_mass, "Herbivores")
 
 png(filename = "figures/groupers_net_temp_mass.png", res = 150, width = 12, height = 3.7, units = "in")
 plotMRF_net_cont(species_mats_mass$grps_mass_mat, biomass_models$grps_mass, node_names = guilds$groupers, covariate = "temp")
-dev.off()
+# dev.off()
 
-png(filename = "figures/seabreams_net_temp_mass.png", res = 150, width = 12, height = 3.7, units = "in")
+# png(filename = "figures/seabreams_net_temp_mass.png", res = 150, width = 12, height = 3.7, units = "in")
 plotMRF_net_cont(species_mats_mass$dip_mass_mat, biomass_models$dip_mass, node_names = guilds$diplodus, covariate = "temp")
-dev.off()
+# dev.off()
 
-png(filename = "figures/herbivores_net_temp_mass.png", res = 150, width = 12, height = 3.7, units = "in")
+# png(filename = "figures/herbivores_net_temp_mass.png", res = 150, width = 12, height = 3.7, units = "in")
 plotMRF_net_cont(species_mats_mass$herb_mass_mat, biomass_models$herb_mass, node_names = guilds$herbivores, covariate = "temp")
-dev.off()
+# dev.off()
 
 
 ## MPA networks for Biomass models -----------------------------------------
 
-png(filename = "figures/groupers_net_mpa_mass.png", res = 150, width = 13, height = 7.38, units = "in")
+# png(filename = "figures/groupers_net_mpa_mass.png", res = 150, width = 13, height = 7.38, units = "in")
 plotMRF_net_factor(species_mats_mass$grps_mass_mat, biomass_models$grps_mass, guilds$grouper, covariate = "mpa")
-dev.off()
+# dev.off()
 
-png(filename = "figures/seabreams_net_mpa_mass.png", res = 150, width = 13, height = 7.38, units = "in")
+# png(filename = "figures/seabreams_net_mpa_mass.png", res = 150, width = 13, height = 7.38, units = "in")
 plotMRF_net_factor(species_mats_mass$dip_mass_mat, biomass_models$dip_mass, guilds$diplodus, covariate = "mpa")
-dev.off()
+# dev.off()
 
-png(filename = "figures/herbivores_net_mpa_mass.png", res = 150, width = 13, height = 7.38, units = "in")
+# png(filename = "figures/herbivores_net_mpa_mass.png", res = 150, width = 13, height = 7.38, units = "in")
 plotMRF_net_factor(species_mats_mass$herb_mass_mat, biomass_models$herb_mass, guilds$herbivores, covariate = "mpa")
-dev.off()
+# dev.off()
 
 
