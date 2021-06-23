@@ -65,7 +65,7 @@ plot_graph(biomass_models$herb_mass, "Herbivores")
 
 ## Temperature networks for Biomass models ---------------------------------
 
-png(filename = "figures/groupers_net_temp_mass.png", res = 150, width = 12, height = 3.7, units = "in")
+# png(filename = "figures/groupers_net_temp_mass.png", res = 150, width = 12, height = 3.7, units = "in")
 plotMRF_net_cont(species_mats_mass$grps_mass_mat, biomass_models$grps_mass, node_names = guilds$groupers, covariate = "temp")
 # dev.off()
 
