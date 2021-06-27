@@ -27,7 +27,7 @@ I can evaluate the Poisson (CRF) model by its deviance or MSE. The MSE value isn
 
 ```{r message=FALSE, warning=FALSE, results='hide', fig.show='show', cache=TRUE, fig.height=4, fig.width=4}
 cv.preds.list <- lapply(species_mats, FUN = function(x){
-  cv_MRF_diag_rep(data = x, n_nodes = 4, family = 'poisson',
+  my_cv_MRF_diag_rep(data = x, n_nodes = 4, family = 'poisson',
                   compare_null = TRUE, plot = FALSE, n_fold_runs = 100)})
 names(cv.preds.list) <- guilds  
 
