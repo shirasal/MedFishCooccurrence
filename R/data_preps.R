@@ -162,3 +162,20 @@ write_rds(herb_mass_mat, "data/processed/herb_mass_mat.rds")
 guild_colours <- list(grps = "#c54607", dip = "#145d82", herb = "#43aa8b")
 write_rds(guild_colours, "data/processed/guild_colours.rds")
 
+
+# Create dataset relevant for my analysis ---------------------------------
+# Long format, for checks etc.
+
+my_data <- med_clean %>% 
+  mutate(abundance = log2(sp.n + 0.1)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  mutate(sp_group = case_when(species %in% groupers ~ "Groupers",
+                              species %in% diplodus ~ "Seabreams",
+                              species %in% herbivores ~ "Herbivores")) %>% 
+  mutate(sp_group = factor(sp_group, levels = c("Groupers", "Seabreams", "Herbivores"))) %>% 
+  mutate(col = case_when(sp_group == "Groupers" ~ "#c54607",
+                         sp_group == "Seabreams" ~ "#145d82",
+                         sp_group == "Herbivores" ~ "#43aa8b")) %>% 
+  mutate(col = as_factor(col))
+
+write_rds(my_data, "data/processed/my_data.rds")
