@@ -14,7 +14,7 @@ rel_imp_sum <- function(guild_mod){
       group_by(cov_type) %>%  # Filter by relevant covariates
       summarise(sum_rel_imp = sum(Rel_importance))}) %>% # Summarise Rel_importance column
     bind_rows(.id = "species") %>% 
-    pivot_wider(id_cols = species, names_from = cov_type, values_from = sum_rel_imp)
+    pivot_wider(id_cols = species, names_from = cov_type, values_from = sum_rel_imp, values_fill = 0)
 }
 
 ### Plot relative importance of covariates by covariate for each species, within guild:
