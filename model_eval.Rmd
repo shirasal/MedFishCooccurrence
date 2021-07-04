@@ -48,6 +48,25 @@ lapply(1:3, function(i){
 })
 
 ```
+Calculate mean deviance
+```{r}
+tibble(Group = c("Groupers", "Seabreams", "Herbivores"),
+       Mean_Deviance = c(cv.preds.list$groupers %>% filter(model == "CRF") %>% summarise(mean(Deviance)) %>% as.double(), 
+                   cv.preds.list$seabreams %>% filter(model == "CRF") %>% summarise(mean(Deviance)) %>% as.double(), 
+                   cv.preds.list$herbivores %>% filter(model == "CRF") %>% summarise(mean(Deviance)) %>% as.double()
+       ))
+```
+
+... and Mean MSE
+```{r}
+tibble(Group = c("Groupers", "Seabreams", "Herbivores"),
+       Mean_MSE = c(cv.preds.list$groupers %>% filter(model == "CRF") %>% summarise(mean(MSE)) %>% as.double(), 
+                   cv.preds.list$seabreams %>% filter(model == "CRF") %>% summarise(mean(MSE)) %>% as.double(), 
+                   cv.preds.list$herbivores %>% filter(model == "CRF") %>% summarise(mean(MSE)) %>% as.double()
+       ))
+```
+
+
 
 ## Biomass model relative importance results
 
@@ -90,5 +109,14 @@ tibble(Group = c("Groupers", "Seabreams", "Herbivores"),
                    cv.biomass.list$seabreams %>% filter(model == "CRF") %>% summarise(mean(Rsquared)) %>% as.double(), 
                    cv.biomass.list$herbivores %>% filter(model == "CRF") %>% summarise(mean(Rsquared)) %>% as.double()
 ))
+```
+
+... and Mean MSE
+```{r}
+tibble(Group = c("Groupers", "Seabreams", "Herbivores"),
+       Mean_MSE = c(cv.biomass.list$groupers %>% filter(model == "CRF") %>% summarise(mean(MSE)) %>% as.double(), 
+                   cv.biomass.list$seabreams %>% filter(model == "CRF") %>% summarise(mean(MSE)) %>% as.double(), 
+                   cv.biomass.list$herbivores %>% filter(model == "CRF") %>% summarise(mean(MSE)) %>% as.double()
+       ))
 ```
 
