@@ -51,7 +51,7 @@ plot_graph <- function(guild_mod, plot_title){
   deg <- igraph::degree(net, mode = "all")
   ggraph(net, layout = "circle") + 
     geom_edge_link(aes(width = weights, color = weights < 0), lineend = "round", linejoin = "round") +
-    scale_edge_width(range = c(0, 3)) +
+    # scale_edge_width(range = c(0, 3)) +
     scale_edge_color_manual(values = c(net_cols[["pos"]], net_cols[["neg"]])) +
     geom_node_point(aes(size = deg), col = "grey", alpha = 0.5) +
     geom_node_text(aes(label = str_replace(name, "\\.", "\\ ")), repel = TRUE, check_overlap = TRUE, 
