@@ -64,7 +64,7 @@ create_spp_mat <- function(dataset, guild, metric, covariate){
   } else if(metric == "biomass") {
     dataset %>%
       group_by_at(.vars = cols) %>%
-      summarise(n = log(sum(biomass)+1), .groups = "drop") %>% 
+      summarise(n = as.numeric(scale(sum(biomass))), .groups = "drop") %>% 
       spread(species, n, fill = 0) %>% 
       # Add unique rownames that describe the site and transect:
       mutate(loc = paste(site, trans)) %>% 
@@ -146,6 +146,8 @@ herb_NAs <- herb_mass_mat %>% as_tibble(rownames = NA) %>% rownames_to_column("I
   select(ID, all_of(all_covs))
 nrow(dip_NAs) # 529 observations removed from analysis due to missing information
 herb_mass_mat %<>% filter(!is.na(temp), !is.na(depth), !is.na(prod), !is.na(mpa))
+
+# locations_removed <- read_csv("issues/locations_removed.csv")
 
 setdiff(setdiff(grps_NAs, dip_NAs, herb_NAs), locations_removed) 
 # They're all the same, so I can just keep the one from before
