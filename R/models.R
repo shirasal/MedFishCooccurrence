@@ -13,6 +13,8 @@ matrices <- list("data/processed/grps_mat.rds",
 species_mats <- lapply(matrices, read_rds)
 names(species_mats) <- c("grps_mat", "dip_mat", "herb_mat")
 
+set.seed(100)
+
 # Nonspatial Poisson CRF --------------------------------------------------
 
 poisson_models <- lapply(species_mats, function(x){MRFcov(x, n_nodes = 4, family = "poisson")})
