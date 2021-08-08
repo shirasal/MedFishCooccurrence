@@ -75,7 +75,7 @@ plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate){
     igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
                                         cols[["neg"]],
                                         cols[["pos"]])
-    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight*20)
+    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight)
     igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
     igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
     
@@ -138,7 +138,7 @@ plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate){
     igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
                                         cols[["neg"]],
                                         cols[["pos"]])
-    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight*20)
+    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight)
     igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
     igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
     
