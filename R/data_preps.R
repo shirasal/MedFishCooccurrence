@@ -14,7 +14,7 @@ med_clean <- medata %>%
          depth = as.vector(scale(depth)),
          sal = as.vector(scale(sal_mean)),
          prod = as.vector(scale(pp_mean)),
-         biomass = a*sp.length^b) %>%
+         biomass = (a*sp.length^b)*sp.n) %>%
   select(site, lon, lat, trans, species, sp.n, biomass, mpa, temp, depth, prod)
 
 # Herbivores require another filtering:
@@ -27,7 +27,7 @@ med_clean_east <- medata %>%
          depth = as.vector(scale(depth)),
          sal = as.vector(scale(sal_mean)),
          prod = as.vector(scale(pp_mean)),
-         biomass = a*sp.length^b) %>%
+         biomass = (a*sp.length^b)*sp.n) %>%
     select(site, lon, lat, trans, species, sp.n, biomass, mpa, temp, depth, prod)
 
 write_rds(med_clean, "data/processed/med_clean.rds")
