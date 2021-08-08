@@ -2,6 +2,8 @@
 source("R/packages.R")
 source("R/functions.R")
 
+set.seed(100)
+
 env_cov <- read_rds("data/all_covs.rds")[1:3]
 mpa_cov <- read_rds("data/all_covs.rds")[4]
 guild_colours <- read_rds("data/processed/guild_colours.rds")
@@ -12,8 +14,6 @@ matrices <- list("data/processed/grps_mat.rds",
 
 species_mats <- lapply(matrices, read_rds)
 names(species_mats) <- c("grps_mat", "dip_mat", "herb_mat")
-
-set.seed(100)
 
 # Nonspatial Poisson CRF --------------------------------------------------
 
@@ -116,7 +116,7 @@ p_relimp_herb_mass <- mass_relimp$herb_mass_relimp %>% select(-`NA`) %>%
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = guild_colours$herb) +
   facet_wrap(~facet.title, nrow = 1) +
-  labs(subtitle = "Herbivores", y = "Relative Importance (prop.)") +
+  labs(title = "Herbivores", y = "Relative Importance (prop.)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "italic"), strip.placement = "outside",
         axis.title.x = element_blank(), 
         strip.text.x = element_text(size = 12, face = "bold"),
@@ -130,7 +130,7 @@ p_relimp_herb_mass <- mass_relimp$herb_mass_relimp %>% select(-`NA`) %>%
 # ggsave(plot = p_relimp_herb_mass, filename = "figures/relimp_herb_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
 
-patch_plot_mass <- p_relimp_grps_mass / p_relimp_dip_mass / p_relimp_herb_mass
+(patch_plot_mass <- p_relimp_grps_mass / p_relimp_dip_mass / p_relimp_herb_mass)
 # Remove y axis titles from first and third subplots and enlarge the middle one's
 patch_plot_mass[[1]] <- patch_plot_mass[[1]] + theme(axis.title.y = element_blank())
 patch_plot_mass[[2]] <- patch_plot_mass[[2]] + theme(axis.title.y = element_text(size = 14, vjust = 5))

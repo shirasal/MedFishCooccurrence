@@ -36,7 +36,7 @@ plot_relimp <- function(rel_imp_df, guild_col, guild_name){
     aes(x = species, y = rel_imp) +
     stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = guild_colours[[guild_col]]) +
     facet_wrap(~facet.title, nrow = 1) +
-    labs(subtitle = guild_name, y = "Relative Importance (prop.)") +
+    labs(title = guild_name, y = "Relative Importance (prop.)") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "italic"), strip.placement = "outside",
           axis.title.x = element_blank(), 
           strip.text.x = element_text(size = 12, face = "bold"),
