@@ -2,8 +2,6 @@
 source("R/packages.R")
 source("R/functions.R")
 
-set.seed(100)
-
 env_cov <- read_rds("data/all_covs.rds")[1:3]
 mpa_cov <- read_rds("data/all_covs.rds")[4]
 guild_colours <- read_rds("data/processed/guild_colours.rds")
@@ -12,10 +10,10 @@ matrices <- list("data/processed/grps_mat.rds",
                  "data/processed/dip_mat.rds",
                  "data/processed/herb_mat.rds")
 
+# Nonspatial Poisson CRF --------------------------------------------------
+
 species_mats <- lapply(matrices, read_rds)
 names(species_mats) <- c("grps_mat", "dip_mat", "herb_mat")
-
-# Nonspatial Poisson CRF --------------------------------------------------
 
 poisson_models <- lapply(species_mats, function(x){MRFcov(x, n_nodes = 4, family = "poisson")})
 names(poisson_models) <- c("grps_pois", "dip_pois", "herb_pois")
@@ -119,7 +117,7 @@ patch_plot_mass
 # ggsave("figures/mass/rel_imp_mass.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
 
 
-# Nonstationarity ---------------------------------------------------------
+## Nonstationarity ---------------------------------------------------------
 
 all_relimp_mass <- list(grps = mass_relimp$grps_mass_relimp,
                         dip = mass_relimp$dip_mass_relimp,
