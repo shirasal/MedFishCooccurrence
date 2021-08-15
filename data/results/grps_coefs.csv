@@ -1,0 +1,22 @@
+Focal species,Variable,RI,Key coefficient
+Epinephelus costae,Temperature x Epinephelus marginatus,0.6579072920431912,-1.025998334053113
+Epinephelus costae,Productivity x Epinephelus marginatus,0.3208709174565429,0.7165219243637916
+Epinephelus costae,Depth x Epinephelus marginatus,0.010209577594635996,0.12781098819590514
+Epinephelus marginatus,Temperature x Epinephelus costae,0.6056640023763996,-1.025998334053113
+Epinephelus marginatus,Productivity x Epinephelus costae,0.29539110823559445,0.7165219243637916
+Epinephelus marginatus,Temperature,0.05070667903051236,-0.29686798075025295
+Epinephelus marginatus,Productivity,0.01402060482306553,0.15610404217371196
+Serranus cabrilla,Temperature,0.49344316307894426,-0.22823309426418395
+Serranus cabrilla,MPA x Serranus scriba,0.22915259014623646,0.15553295936315092
+Serranus cabrilla,Depth,0.18242018482791203,0.13877029002776367
+Serranus cabrilla,Productivity x Serranus scriba,0.043687007016887096,-0.06791038559954454
+Serranus cabrilla,Serranus scriba,0.033524676132737546,0.059489777657709034
+Serranus scriba,MPA x Serranus cabrilla,0.3539760691955408,0.15553295936315092
+Serranus scriba,Depth,0.24080988682420118,0.12828404373368987
+Serranus scriba,Temperature,0.1775521495990004,-0.1101535382442938
+Serranus scriba,Productivity x Serranus cabrilla,0.06748409437086034,-0.06791038559954454
+Serranus scriba,Serranus cabrilla,0.05178616166174241,0.059489777657709034
+Serranus scriba,MPA,0.04112516095063179,0.053013843258903966
+Serranus scriba,Productivity,0.025895072851567377,-0.04206724326980057
+Serranus scriba,Epinephelus marginatus,0.017522333643567874,-0.03460441064961053
+Serranus scriba,Temperature x Serranus cabrilla,0.013894012356268788,0.03081408844442105
