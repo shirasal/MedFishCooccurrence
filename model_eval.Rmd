@@ -105,9 +105,12 @@ Check the Mean R^2 for each model
 
 ```{r}
 tibble(Group = c("Groupers", "Seabreams", "Herbivores"),
-       Mean_R2 = c(cv.biomass.list$groupers %>% filter(model == "CRF") %>% summarise(mean(Rsquared)) %>% as.double(), 
-                   cv.biomass.list$seabreams %>% filter(model == "CRF") %>% summarise(mean(Rsquared)) %>% as.double(), 
-                   cv.biomass.list$herbivores %>% filter(model == "CRF") %>% summarise(mean(Rsquared)) %>% as.double()
+       Mean_R2 = c(cv.biomass.list$groupers %>% filter(model == "CRF") %>% 
+                     summarise(round(mean(Rsquared), 3)) %>% as.double(),
+                   cv.biomass.list$seabreams %>% filter(model == "CRF") %>% 
+                     summarise(round(mean(Rsquared), 3)) %>% as.double(),
+                   cv.biomass.list$herbivores %>% filter(model == "CRF") %>% 
+                     summarise(round(mean(Rsquared), 3)) %>% as.double()
 ))
 ```
 

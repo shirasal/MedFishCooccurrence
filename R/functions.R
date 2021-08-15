@@ -30,7 +30,9 @@ plot_relimp <- function(rel_imp_df, guild_col, guild_name){
     pivot_longer(2:length(.)) %>%
     rename(covariate = name, rel_imp = value) %>%
     mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
-    right_join(cov_titles, by = "covariate") %>% 
+    group_by(species) %>% nest() %>% 
+    mutate(new_data = map(data, function(x) right_join(x, cov_titles, by = "covariate"))) %>% 
+    select(-data) %>% unnest(cols = c(new_data)) %>% replace_na(list(rel_imp = 0)) %>% 
     # Plot:
     ggplot() +
     aes(x = species, y = rel_imp) +

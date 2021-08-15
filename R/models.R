@@ -92,42 +92,26 @@ mass_relimp$grps_mass_relimp
 mass_relimp$dip_mass_relimp
 mass_relimp$herb_mass_relimp
 
-cov_titles <- tibble(covariate = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
-                     facet.title = factor(c("Environment", "MPA", "Biotic Associations",
-                                            "Temp * Biotic", "MPA * Biotic"),
-                                          levels = c("Environment", "MPA", "Biotic Associations",
-                                                     "Temp * Biotic", "MPA * Biotic")))
+# cov_titles <- tibble(covariate = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
+#                      facet.title = factor(c("Environment", "MPA", "Biotic Associations",
+#                                             "Temp * Biotic", "MPA * Biotic"),
+#                                           levels = c("Environment", "MPA", "Biotic Associations",
+#                                                      "Temp * Biotic", "MPA * Biotic")))
 
 p_relimp_grps_mass <- mass_relimp$grps_mass_relimp %>% 
   plot_relimp(guild_col = "grps", guild_name = "Groupers")
-  
+
 p_relimp_dip_mass <- mass_relimp$dip_mass_relimp %>% select(-`NA`) %>% 
   plot_relimp(guild_col = "dip", guild_name = "Seabreams")
 
 p_relimp_herb_mass <- mass_relimp$herb_mass_relimp %>% select(-`NA`) %>% 
-  pivot_longer(2:length(.)) %>%
-  rename(covariate = name, rel_imp = value) %>%
-  add_row(species = colnames(species_mats_mass$herb_mass_mat[1:4]), covariate = "mpa_bio", rel_imp = 0) %>% 
-  right_join(cov_titles, by = "covariate") %>% 
-  mutate(species = str_replace_all(species, "\\.", "\\ ")) %>% 
-  filter(!is.na(species)) %>% 
-  # Plot:
-  ggplot() +
-  aes(x = species, y = rel_imp) +
-  stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = guild_colours$herb) +
-  facet_wrap(~facet.title, nrow = 1) +
-  labs(title = "Herbivores", y = "Relative Importance (prop.)") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "italic"), strip.placement = "outside",
-        axis.title.x = element_blank(), 
-        strip.text.x = element_text(size = 12, face = "bold"),
-        plot.margin = margin(.2,1,.2,1, "cm"))
+  plot_relimp(guild_col = "herb", guild_name = "Herbivores")
 
-
-# ggsave(plot = p_relimp_grps_mass, filename = "figures/relimp_grps_mass.png", device = "png",
+# ggsave(plot = p_relimp_grps_mass, filename = "figures/mass/relimp_grps_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
-# ggsave(plot = p_relimp_dip_mass, filename = "figures/relimp_dip_mass.png", device = "png",
+# ggsave(plot = p_relimp_dip_mass, filename = "figures/mass/relimp_dip_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
-# ggsave(plot = p_relimp_herb_mass, filename = "figures/relimp_herb_mass.png", device = "png",
+# ggsave(plot = p_relimp_herb_mass, filename = "figures/mass/relimp_herb_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
 
 (patch_plot_mass <- p_relimp_grps_mass / p_relimp_dip_mass / p_relimp_herb_mass)
@@ -137,6 +121,6 @@ patch_plot_mass[[2]] <- patch_plot_mass[[2]] + theme(axis.title.y = element_text
 patch_plot_mass[[3]] <- patch_plot_mass[[3]] + theme(axis.title.y = element_blank())
 
 patch_plot_mass
-# ggsave("figures/rel_imp_mass.png", device = "png", dpi = 150, height = 10, width = 10, units = "in")
-# ggsave("figures/rel_imp_mass.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
+# ggsave("figures/mass/rel_imp_mass.png", device = "png", dpi = 150, height = 10, width = 10, units = "in")
+# ggsave("figures/mass/rel_imp_mass.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
 
