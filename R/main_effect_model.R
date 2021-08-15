@@ -1,10 +1,10 @@
-# Run the beggining of 'models.R' first
+# Run the beginning of 'models.R' first
 
 n_nodes = 4
 
 # Groupers ----------------------------------------------------------------
 
-grps_dat <- species_mats$grps_mat
+grps_dat <- species_mats_mass$grps_mass_mat
 
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
@@ -18,7 +18,7 @@ grps_prepped_dat <- grps_prepped_dat %>%
   mutate(across(.cols = 9:ncol(grps_prepped_dat), .fns = function(x) 0))
 
 # Re-fit the model, setting prep_covariates to FALSE
-grps_no_int <- MRFcov(grps_prepped_dat, n_nodes = 4, prep_covariates = F, family = 'poisson')
+grps_no_int <- MRFcov(grps_prepped_dat, n_nodes = 4, prep_covariates = F, family = 'gaussian')
 grps_no_int$graph
 grps_no_int$direct_coefs
 
@@ -28,7 +28,7 @@ grps_noint_relimp <- rel_imp_sum(grps_no_int)
 
 # Seabreams ---------------------------------------------------------------
 
-dip_dat <- species_mats$dip_mat
+dip_dat <- species_mats_mass$dip_mass_mat
 
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
@@ -42,7 +42,7 @@ dip_prepped_dat <- dip_prepped_dat %>%
   mutate(across(.cols = 9:ncol(dip_prepped_dat), .fns = function(x) 0))
 
 # Re-fit the model, setting prep_covariates to FALSE
-dip_no_int <- MRFcov(dip_prepped_dat, n_nodes = 4, prep_covariates = F, family = 'poisson')
+dip_no_int <- MRFcov(dip_prepped_dat, n_nodes = 4, prep_covariates = F, family = 'gaussian')
 dip_no_int$graph
 dip_no_int$direct_coefs
 
@@ -52,7 +52,7 @@ dip_noint_relimp <- rel_imp_sum(dip_no_int)
 
 # Herbivores --------------------------------------------------------------
 
-herb_dat <- species_mats$herb_mat
+herb_dat <- species_mats_mass$herb_mass_mat
 
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
@@ -66,7 +66,7 @@ herb_prepped_dat <- herb_prepped_dat %>%
   mutate(across(.cols = 9:ncol(herb_prepped_dat), .fns = function(x) 0))
 
 # Re-fit the model, setting prep_covariates to FALSE
-herb_no_int <- MRFcov(herb_prepped_dat, n_nodes = 4, prep_covariates = F, family = 'poisson')
+herb_no_int <- MRFcov(herb_prepped_dat, n_nodes = 4, prep_covariates = F, family = 'gaussian')
 herb_no_int$graph
 herb_no_int$direct_coefs
 
@@ -83,9 +83,12 @@ cov_titles_noint <- tibble(covariate = c("env", "mpa", "bio"),
                                                 levels = c("Environment", "MPA", "Biotic Associations")))
 
 p_relimp_grps_noint <- grps_noint_relimp %>%
-  pivot_longer(2:length(.), names_to = "covariate", values_to = "rel_imp") %>%
+  pivot_longer(2:length(.)) %>%
+  rename(covariate = name, rel_imp = value) %>%
   mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
-  right_join(cov_titles_noint, by = "covariate") %>% 
+  group_by(species) %>% nest() %>% 
+  mutate(new_data = map(data, function(x) right_join(x, cov_titles_noint, by = "covariate"))) %>% 
+  select(-data) %>% unnest(cols = c(new_data)) %>% replace_na(list(rel_imp = 0)) %>%
   # Plot:
   ggplot() +
   aes(x = species, y = rel_imp) +
@@ -99,9 +102,12 @@ p_relimp_grps_noint <- grps_noint_relimp %>%
 
 
 p_relimp_dip_noint <- dip_noint_relimp %>%
-  pivot_longer(2:length(.), names_to = "covariate", values_to = "rel_imp") %>%
+  pivot_longer(2:length(.)) %>%
+  rename(covariate = name, rel_imp = value) %>%
   mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
-  right_join(cov_titles_noint, by = "covariate") %>% 
+  group_by(species) %>% nest() %>% 
+  mutate(new_data = map(data, function(x) right_join(x, cov_titles_noint, by = "covariate"))) %>% 
+  select(-data) %>% unnest(cols = c(new_data)) %>% replace_na(list(rel_imp = 0)) %>%
   # Plot:
   ggplot() +
   aes(x = species, y = rel_imp) +
@@ -114,9 +120,12 @@ p_relimp_dip_noint <- dip_noint_relimp %>%
         plot.margin = margin(.2,1,.2,1, "cm"))
 
 p_relimp_herb_noint <- herb_noint_relimp %>%
-  pivot_longer(2:length(.), names_to = "covariate", values_to = "rel_imp") %>%
+  pivot_longer(2:length(.)) %>%
+  rename(covariate = name, rel_imp = value) %>%
   mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
-  right_join(cov_titles_noint, by = "covariate") %>% 
+  group_by(species) %>% nest() %>% 
+  mutate(new_data = map(data, function(x) right_join(x, cov_titles_noint, by = "covariate"))) %>% 
+  select(-data) %>% unnest(cols = c(new_data)) %>% replace_na(list(rel_imp = 0)) %>%
   # Plot:
   ggplot() +
   aes(x = species, y = rel_imp) +
