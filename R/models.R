@@ -127,9 +127,19 @@ all_relimp_mass <- list(grps = mass_relimp$grps_mass_relimp,
 
 # Compare stationary and nonstationary effects:
 lapply(all_relimp_mass, function(x){
+  cov_titles <- tibble(covariate = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
+                       facet.title = factor(c("Environment", "MPA", "Biotic Associations",
+                                              "Temp * Biotic", "MPA * Biotic"),
+                                            levels = c("Environment", "MPA", "Biotic Associations",
+                                                       "Temp * Biotic", "MPA * Biotic")))
   x %>% 
-    pivot_longer(2:ncol(.), names_to = "type", values_to = "rel_imp") %>% 
-    mutate(nonstationary = str_detect(type, "_bio")) %>% 
+    pivot_longer(2:length(.)) %>%
+    rename(covariate = name, rel_imp = value) %>%
+    mutate(species = str_replace_all(species, "\\.", "\\ ")) %>%
+    group_by(species) %>% nest() %>% 
+    mutate(new_data = map(data, function(x) right_join(x, cov_titles, by = "covariate"))) %>% 
+    select(-data) %>% unnest(cols = c(new_data)) %>% replace_na(list(rel_imp = 0)) %>% 
+    mutate(nonstationary = str_detect(facet.title, "\\*")) %>% 
     group_by(species, nonstationary) %>% 
     na.omit() %>% 
     summarise(sum = sum(rel_imp)) %>% 
