@@ -92,12 +92,6 @@ mass_relimp$grps_mass_relimp
 mass_relimp$dip_mass_relimp
 mass_relimp$herb_mass_relimp
 
-# cov_titles <- tibble(covariate = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
-#                      facet.title = factor(c("Environment", "MPA", "Biotic Associations",
-#                                             "Temp * Biotic", "MPA * Biotic"),
-#                                           levels = c("Environment", "MPA", "Biotic Associations",
-#                                                      "Temp * Biotic", "MPA * Biotic")))
-
 p_relimp_grps_mass <- mass_relimp$grps_mass_relimp %>% 
   plot_relimp(guild_col = "grps", guild_name = "Groupers")
 
@@ -123,4 +117,24 @@ patch_plot_mass[[3]] <- patch_plot_mass[[3]] + theme(axis.title.y = element_blan
 patch_plot_mass
 # ggsave("figures/mass/rel_imp_mass.png", device = "png", dpi = 150, height = 10, width = 10, units = "in")
 # ggsave("figures/mass/rel_imp_mass.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
+
+
+# Nonstationarity ---------------------------------------------------------
+
+all_relimp_mass <- list(grps = mass_relimp$grps_mass_relimp,
+                        dip = mass_relimp$dip_mass_relimp,
+                        herb = mass_relimp$herb_mass_relimp)
+
+# Compare stationary and nonstationary effects:
+lapply(all_relimp_mass, function(x){
+  x %>% 
+    pivot_longer(2:ncol(.), names_to = "type", values_to = "rel_imp") %>% 
+    mutate(nonstationary = str_detect(type, "_bio")) %>% 
+    group_by(species, nonstationary) %>% 
+    na.omit() %>% 
+    summarise(sum = sum(rel_imp)) %>% 
+    group_by(nonstationary) %>% 
+    summarise(mean_RI = mean(sum))
+})
+
 
