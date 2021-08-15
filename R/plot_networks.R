@@ -53,6 +53,10 @@ plotMRF_net_factor(species_mats$herb_mat, poisson_models$herb_pois, guilds$herbi
 
 # Biomass network gradients ------------------------------------------------
 
+guilds <- list(groupers = colnames(species_mats_mass$grps_mass_mat)[1:4],
+               diplodus = colnames(species_mats_mass$dip_mass_mat)[1:4],
+               herbivores = colnames(species_mats_mass$herb_mass_mat)[1:4])
+
 plot_graph(biomass_models$grps_mass, "Groupers")
 # ggsave("figures/mass/groupers_mass_network_overall.png", device = "png", dpi = 300, width = 4, unit = "in")
 
