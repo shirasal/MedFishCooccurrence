@@ -29,7 +29,7 @@ create_spp_mat <- function(dataset, guild, metric, covariate){
       column_to_rownames("loc") %>% 
       filter(!is.na(depth)) %>% 
       select(all_of(guild), all_of(covariate)) %>% 
-      mutate(across(.cols = everything(), .fns = function(x){as.vector(scale(x))})) %>% 
+      mutate(across(.cols = c(all_of(guild),all_of(env_cov)), .fns = function(x){as.vector(scale(x))})) %>% 
       ungroup()
   } else {
     stop("Metric should be either 'sp.n', 'abundance' or 'biomass'")
