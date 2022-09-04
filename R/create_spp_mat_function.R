@@ -11,7 +11,7 @@ create_spp_mat <- function(dataset, guild, metric, covariate){
       summarise(n = sum(sp.n), .groups = "drop") %>% 
       spread(species, n, fill = 0) %>% 
       # Add unique rownames that describe the site and transect:
-      mutate(loc = paste(site, trans)) %>% 
+      mutate(loc = make.unique(paste(site, trans, sep = "_"))) %>% 
       group_by(loc) %>%
       column_to_rownames("loc") %>% 
       filter(!is.na(depth)) %>% 
@@ -24,7 +24,7 @@ create_spp_mat <- function(dataset, guild, metric, covariate){
       summarise(n = sum(biomass), .groups = "drop") %>% 
       spread(species, n, fill = 0) %>% 
       # Add unique rownames that describe the site and transect:
-      mutate(loc = paste(site, trans)) %>% 
+      mutate(loc = make.unique(paste(site, trans, sep = "_"))) %>% 
       group_by(loc) %>%
       column_to_rownames("loc") %>% 
       filter(!is.na(depth)) %>% 
