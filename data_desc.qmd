@@ -30,7 +30,6 @@ medata <- read_rds("data/medata.Rds") %>%
 
 `med_clean` is the `medata` data set after the following treatment:
 
--   filter out presence-absence data.
 -   categorise `mpa` to logical by enforcement level.
 -   `biomass` calculated using `sp.length`, which is the individual length recorded (estimated, in cm)
 -   selected relevant columns only and changed some variable names
@@ -41,7 +40,6 @@ medata <- read_rds("data/medata.Rds") %>%
 ```{r}
 #| cache: true
 med_clean <- medata %>%
-  filter(data.origin != "azz_asi") %>% # presence-absence
   mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
          temp = tmean,
          prod = pp_mean,
@@ -92,33 +90,20 @@ I created a function to create these data sets according to the data I wanted, w
 
 ```{r}
 create_spp_mat <- function(dataset, guild, metric, covariate){
-  cols <- c(c("lat", "lon", "site", "trans", "species"), env_cov, mpa_cov)
   if (metric == "sp.n" | metric == "abundance") {
     dataset %>% 
-      group_by_at(.vars = cols) %>%
-      summarise(n = sum(sp.n), .groups = "drop") %>% 
-      spread(species, n, fill = 0) %>% 
-      # Add unique rownames that describe the site and transect:
-      mutate(loc = make.unique(paste(site, trans, sep = "_"))) %>% 
-      group_by(loc) %>%
-      column_to_rownames("loc") %>% 
-      filter(!is.na(depth)) %>% 
+      filter(species %in% guild,
+             !is.na(depth)) %>% 
+      pivot_wider(names_from = species, values_from = sp.n, values_fill = 0, values_fn = sum) %>% 
       select(all_of(guild), all_of(covariate)) %>% 
-      mutate(across(.cols = all_of(env_cov), .fns = function(x){as.vector(scale(x))})) %>% 
-      ungroup()
+      mutate(across(.cols = c(all_of(guild),all_of(env_cov)), .fns = function(x){as.vector(scale(x))}))
   } else if(metric == "biomass") {
     dataset %>%
-      group_by_at(.vars = cols) %>%
-      summarise(n = sum(biomass), .groups = "drop") %>% 
-      spread(species, n, fill = 0) %>% 
-      # Add unique rownames that describe the site and transect:
-      mutate(loc = make.unique(paste(site, trans, sep = "_"))) %>% 
-      group_by(loc) %>%
-      column_to_rownames("loc") %>% 
-      filter(!is.na(depth)) %>% 
+      filter(species %in% guild,
+             !is.na(depth)) %>% 
+      pivot_wider(names_from = species, values_from = biomass, values_fill = 0, values_fn = sum) %>% 
       select(all_of(guild), all_of(covariate)) %>% 
-      mutate(across(.cols = c(all_of(guild),all_of(env_cov)), .fns = function(x){as.vector(scale(x))})) %>% 
-      ungroup()
+      mutate(across(.cols = c(all_of(guild),all_of(env_cov)), .fns = function(x){as.vector(scale(x))}))
   } else {
     stop("Metric should be either 'sp.n', 'abundance' or 'biomass'")
   }
@@ -127,31 +112,32 @@ create_spp_mat <- function(dataset, guild, metric, covariate){
 ```
 
 ## Locations
+
 ```{r}
 #| code-fold: true
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  filter(!is.na(depth)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
+  pivot_wider(names_from = species, values_from = sp.n, values_fill = 0, values_fn = sum) %>% 
   distinct(site, trans) %>% 
   summarise(total_transects = n())
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   mutate(sp_group = ifelse(species %in% groupers, "Groupers",
                            ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
-  filter(!is.na(depth)) %>% 
+  pivot_wider(names_from = species, values_from = sp.n, values_fill = 0, values_fn = sum) %>% 
   group_by(sp_group) %>% 
   distinct(site, trans) %>% 
   summarise(total_transects = n())
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   mutate(sp_group = ifelse(species %in% groupers, "Groupers",
                            ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
-  filter(!is.na(depth)) %>% 
+  pivot_wider(names_from = species, values_from = sp.n, values_fill = 0, values_fn = sum) %>% 
   group_by(site) %>% distinct(trans) %>% 
   summarise(total_transects = n())
-  
+
 
 ```
 
@@ -169,10 +155,9 @@ No species with under 10 observations were included.
 ```{r}
 #| code-fold: true
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   mutate(sp_group = ifelse(species %in% groupers, "Groupers",
                            ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
-  filter(!is.na(depth)) %>% 
   arrange(sp_group) %>% 
   group_by(species) %>% 
   distinct(site,trans) %>% 
@@ -202,15 +187,14 @@ unit: °C
 ```{r}
 #| code-fold: true
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   filter(!is.na(depth)) %>% 
   summarise(min_temp = min(temp),
             max_temp = max(temp),
             mean_temp = mean(temp))
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  filter(!is.na(depth)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   mutate(sp_group = ifelse(species %in% groupers, "Groupers",
                            ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
   group_by(sp_group) %>% 
@@ -219,10 +203,9 @@ med_clean %>%
             mean_temp = mean(temp))
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   mutate(sp_group = ifelse(species %in% groupers, "Groupers",
                            ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
-  filter(!is.na(depth)) %>% 
   ggplot() + aes(x = temp, col = sp_group) + geom_density(size = 2) + 
   scale_colour_manual(values = c(guild_colours$grps, guild_colours$herb, guild_colours$dip)) +
   theme_bw() +
@@ -238,15 +221,13 @@ unit: meters
 #| code-fold: true
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  filter(!is.na(depth)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   summarise(min_depth = min(depth),
             max_depth = max(depth),
             mean_depth = mean(depth))
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  filter(!is.na(depth)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   mutate(sp_group = ifelse(species %in% groupers, "Groupers",
                            ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
   group_by(sp_group) %>% 
@@ -255,10 +236,9 @@ med_clean %>%
             mean_depth = mean(depth))
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   mutate(sp_group = ifelse(species %in% groupers, "Groupers",
                            ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
-  filter(!is.na(depth)) %>% 
   ggplot() + aes(x = depth, fill = sp_group) + geom_histogram() + 
   scale_fill_manual(values = c(guild_colours$grps, guild_colours$herb, guild_colours$dip)) +
   scale_x_reverse()+
@@ -277,15 +257,13 @@ unit: g∙m-3∙day-1.
 #| code-fold: true
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  filter(!is.na(depth)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   summarise(min_prod = min(prod),
             max_prod = max(prod),
             mean_prod = mean(prod))
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  filter(!is.na(depth)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   mutate(sp_group = ifelse(species %in% groupers, "Groupers",
                            ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
   group_by(sp_group) %>% 
@@ -294,10 +272,9 @@ med_clean %>%
             mean_prod = mean(prod))
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
   mutate(sp_group = ifelse(species %in% groupers, "Groupers",
                            ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
-  filter(!is.na(depth)) %>% 
   ggplot() + aes(x = prod, col = sp_group, fill = sp_group) + geom_density(alpha = .3) + 
   scale_fill_manual(values = c(guild_colours$grps, guild_colours$herb, guild_colours$dip)) +
   scale_colour_manual(values = c(guild_colours$grps, guild_colours$herb, guild_colours$dip)) +
@@ -318,15 +295,15 @@ We used `MPA` (logical) as a sole anthropogenic pressure predictor. This predict
 #| code-fold: true
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  filter(!is.na(depth)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
+  pivot_wider(names_from = species, values_from = sp.n, values_fill = 0, values_fn = sum) %>% 
   distinct(site, mpa) %>% 
   group_by(mpa) %>% 
   summarise(SITE_count = n())
 
 med_clean %>% 
-  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  filter(!is.na(depth)) %>% 
+  filter(species %in% c(groupers, diplodus, herbivores), !is.na(depth)) %>% 
+  pivot_wider(names_from = species, values_from = sp.n, values_fill = 0, values_fn = sum) %>% 
   distinct(site, trans, mpa) %>% 
   group_by(mpa) %>% 
   summarise(TRANSECT_count = n())
@@ -346,6 +323,20 @@ head(dip_mat)
 head(herb_mat)
 
 ```
+Note that these are **count** data and we used **biomass** data for the models.
 
+Create coordinate datasets to run the spatial models
+```{r}
+grps_cords <- med_clean %>% filter(species %in% groupers, !is.na(depth)) %>% 
+  pivot_wider(names_from = species, values_from = biomass, values_fill = 0, values_fn = sum) %>% 
+  select(lon, lat)
 
+dip_cords <- med_clean %>% filter(species %in% diplodus, !is.na(depth)) %>% 
+  pivot_wider(names_from = species, values_from = biomass, values_fill = 0, values_fn = sum) %>% 
+  select(lon, lat)
+
+herb_cords <- med_clean %>% filter(species %in% herbivores, !is.na(depth)) %>% 
+  pivot_wider(names_from = species, values_from = biomass, values_fill = 0, values_fn = sum) %>% 
+  select(lon, lat)
+```
 

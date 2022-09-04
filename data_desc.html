@@ -149,7 +149,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1 data-number="1"><span class="header-section-number">1</span> Overview of the data used for this research</h1>
 <p><code>med_clean</code> is the <code>medata</code> data set after the following treatment:</p>
 <ul>
-<li>filter out presence-absence data.</li>
 <li>categorise <code>mpa</code> to logical by enforcement level.</li>
 <li><code>biomass</code> calculated using <code>sp.length</code>, which is the individual length recorded (estimated, in cm)</li>
 <li>selected relevant columns only and changed some variable names</li>
@@ -158,14 +157,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Data</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div class="cell" data-hash="data_desc_cache/html/unnamed-chunk-6_a3bab5c2076209e8c6340f2d6ef8279f">
+<div class="cell" data-hash="data_desc_cache/html/unnamed-chunk-6_f8f756e047ace9087c0500d47599a1f9">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="ot">&lt;-</span> medata <span class="sc">%&gt;%</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(data.origin <span class="sc">!=</span> <span class="st">"azz_asi"</span>) <span class="sc">%&gt;%</span> <span class="co"># presence-absence</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mpa =</span> <span class="fu">if_else</span>(enforcement <span class="sc">&lt;=</span> <span class="dv">1</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>),</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">temp =</span> tmean,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">prod =</span> pp_mean,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">biomass =</span> (a<span class="sc">*</span>sp.length<span class="sc">^</span>b)<span class="sc">*</span>sp.n) <span class="sc">%&gt;%</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, lon, lat, trans, species, sp.n, biomass, mpa, temp, depth, prod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mpa =</span> <span class="fu">if_else</span>(enforcement <span class="sc">&lt;=</span> <span class="dv">1</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>),</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">temp =</span> tmean,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">prod =</span> pp_mean,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">biomass =</span> (a<span class="sc">*</span>sp.length<span class="sc">^</span>b)<span class="sc">*</span>sp.n) <span class="sc">%&gt;%</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, lon, lat, trans, species, sp.n, biomass, mpa, temp, depth, prod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
@@ -173,14 +171,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(med_clean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 x 11
-  site        lon   lat trans species     sp.n biomass mpa    temp depth    prod
-  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt; &lt;lgl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-1 lampedusa  12.6  35.5   283 Apogon.im~     1  10.1   FALSE  20.4     2 5.41e-4
-2 lampedusa  12.6  35.5   283 Atherina.~   600 266.    FALSE  20.4     2 5.41e-4
-3 lampedusa  12.6  35.5   283 Oedalechi~    75  51.6   FALSE  20.4     2 5.41e-4
-4 lampedusa  12.6  35.5   283 Sparisoma~     1   0.300 FALSE  20.4     2 5.41e-4
-5 lampedusa  12.6  35.5   283 Sparisoma~     9  57.2   FALSE  20.4     2 5.41e-4
-6 lampedusa  12.6  35.5   283 Sparisoma~     3 331.    FALSE  20.4     2 5.41e-4</code></pre>
+  site      lon   lat trans species       sp.n biomass mpa    temp depth    prod
+  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt; &lt;lgl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+1 asinara  8.21  41.0   199 Chromis.chr~    40      NA TRUE   18.7     2 4.95e-4
+2 asinara  8.21  41.0   199 Coris.julis     10      NA TRUE   18.7     2 4.95e-4
+3 asinara  8.21  41.0   199 Diplodus.sa~     6      NA TRUE   18.7     2 4.95e-4
+4 asinara  8.21  41.0   199 Diplodus.vu~     3      NA TRUE   18.7     2 4.95e-4
+5 asinara  8.21  41.0   199 Mugil.cepha~    20      NA TRUE   18.7     2 4.95e-4
+6 asinara  8.21  41.0   199 Sarpa.salpa     20      NA TRUE   18.7     2 4.95e-4</code></pre>
 </div>
 </div>
 </div>
@@ -232,37 +230,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>I created a function to create these data sets according to the data I wanted, with filtering to the species I wanted to focus on, the metric (counts/abundance or biomass), and the predictors I wanted to include:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>create_spp_mat <span class="ot">&lt;-</span> <span class="cf">function</span>(dataset, guild, metric, covariate){</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">c</span>(<span class="st">"lat"</span>, <span class="st">"lon"</span>, <span class="st">"site"</span>, <span class="st">"trans"</span>, <span class="st">"species"</span>), env_cov, mpa_cov)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (metric <span class="sc">==</span> <span class="st">"sp.n"</span> <span class="sc">|</span> metric <span class="sc">==</span> <span class="st">"abundance"</span>) {</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    dataset <span class="sc">%&gt;%</span> </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by_at</span>(<span class="at">.vars =</span> cols) <span class="sc">%&gt;%</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(sp.n), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">spread</span>(species, n, <span class="at">fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Add unique rownames that describe the site and transect:</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">loc =</span> <span class="fu">make.unique</span>(<span class="fu">paste</span>(site, trans, <span class="at">sep =</span> <span class="st">"_"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(loc) <span class="sc">%&gt;%</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">column_to_rownames</span>(<span class="st">"loc"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="fu">all_of</span>(guild), <span class="fu">all_of</span>(covariate)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="at">.cols =</span> <span class="fu">all_of</span>(env_cov), <span class="at">.fns =</span> <span class="cf">function</span>(x){<span class="fu">as.vector</span>(<span class="fu">scale</span>(x))})) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>()</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span>(metric <span class="sc">==</span> <span class="st">"biomass"</span>) {</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    dataset <span class="sc">%&gt;%</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by_at</span>(<span class="at">.vars =</span> cols) <span class="sc">%&gt;%</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(biomass), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">spread</span>(species, n, <span class="at">fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Add unique rownames that describe the site and transect:</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">loc =</span> <span class="fu">make.unique</span>(<span class="fu">paste</span>(site, trans, <span class="at">sep =</span> <span class="st">"_"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(loc) <span class="sc">%&gt;%</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">column_to_rownames</span>(<span class="st">"loc"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="fu">all_of</span>(guild), <span class="fu">all_of</span>(covariate)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="at">.cols =</span> <span class="fu">c</span>(<span class="fu">all_of</span>(guild),<span class="fu">all_of</span>(env_cov)), <span class="at">.fns =</span> <span class="cf">function</span>(x){<span class="fu">as.vector</span>(<span class="fu">scale</span>(x))})) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>()</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Metric should be either 'sp.n', 'abundance' or 'biomass'"</span>)</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (metric <span class="sc">==</span> <span class="st">"sp.n"</span> <span class="sc">|</span> metric <span class="sc">==</span> <span class="st">"abundance"</span>) {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    dataset <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(species <span class="sc">%in%</span> guild,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>             <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> sp.n, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="fu">all_of</span>(guild), <span class="fu">all_of</span>(covariate)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="at">.cols =</span> <span class="fu">c</span>(<span class="fu">all_of</span>(guild),<span class="fu">all_of</span>(env_cov)), <span class="at">.fns =</span> <span class="cf">function</span>(x){<span class="fu">as.vector</span>(<span class="fu">scale</span>(x))}))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span>(metric <span class="sc">==</span> <span class="st">"biomass"</span>) {</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    dataset <span class="sc">%&gt;%</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(species <span class="sc">%in%</span> guild,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>             <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> biomass, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="fu">all_of</span>(guild), <span class="fu">all_of</span>(covariate)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="at">.cols =</span> <span class="fu">c</span>(<span class="fu">all_of</span>(guild),<span class="fu">all_of</span>(env_cov)), <span class="at">.fns =</span> <span class="cf">function</span>(x){<span class="fu">as.vector</span>(<span class="fu">scale</span>(x))}))</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Metric should be either 'sp.n', 'abundance' or 'biomass'"</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="locations" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="locations"><span class="header-section-number">2.1</span> Locations</h2>
@@ -270,8 +255,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> sp.n, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(site, trans) <span class="sc">%&gt;%</span> </span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_transects =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -279,15 +264,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code># A tibble: 1 x 1
   total_transects
             &lt;int&gt;
-1            1251</code></pre>
+1            1198</code></pre>
 </div>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> sp.n, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sp_group) <span class="sc">%&gt;%</span> </span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(site, trans) <span class="sc">%&gt;%</span> </span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_transects =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -296,35 +281,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code># A tibble: 3 x 2
   sp_group   total_transects
   &lt;chr&gt;                &lt;int&gt;
-1 Groupers               809
-2 Herbivores             894
-3 Seabreams              987</code></pre>
+1 Groupers               771
+2 Herbivores             825
+3 Seabreams              958</code></pre>
 </div>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> sp.n, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(trans) <span class="sc">%&gt;%</span> </span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_transects =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 203 x 2
-   site                  total_transects
-   &lt;chr&gt;                           &lt;int&gt;
- 1 achziv                            103
- 2 adrasan                            18
- 3 alonissos                          18
- 4 assecret1210191mlhb_a               1
- 5 assecret1210191mlhb_b               1
- 6 assecret1210191scso_a               1
- 7 assecret1210191scso_b               1
- 8 assecret1210191scso_c               1
- 9 assecret1210191smss_a               1
-10 assecret1210191smss_b               1
-# ... with 193 more rows</code></pre>
+<pre><code># A tibble: 59 x 2
+   site            total_transects
+   &lt;chr&gt;                     &lt;int&gt;
+ 1 achziv                      103
+ 2 adrasan                      18
+ 3 alonissos                    18
+ 4 asinara                      48
+ 5 assecret1210191               3
+ 6 assecret1210192               3
+ 7 assecret1310191               3
+ 8 assecret1310192               3
+ 9 assecret1310193               2
+10 assecret1410191               3
+# ... with 49 more rows</code></pre>
 </div>
 </div>
 </section>
@@ -350,31 +335,30 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sp_group) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(site,trans) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_observations =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sp_group) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(site,trans) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_observations =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 x 2
    species                n_observations
    &lt;chr&gt;                           &lt;int&gt;
- 1 Diplodus.annularis                216
- 2 Diplodus.puntazzo                 105
- 3 Diplodus.sargus                   686
- 4 Diplodus.vulgaris                 796
- 5 Epinephelus.costae                 67
- 6 Epinephelus.marginatus            164
- 7 Sarpa.salpa                       247
- 8 Serranus.cabrilla                 430
- 9 Serranus.scriba                   543
-10 Siganus.luridus                   341
-11 Siganus.rivulatus                 411
-12 Sparisoma.cretense                345</code></pre>
+ 1 Diplodus.annularis                220
+ 2 Diplodus.puntazzo                 122
+ 3 Diplodus.sargus                   683
+ 4 Diplodus.vulgaris                 763
+ 5 Epinephelus.costae                 60
+ 6 Epinephelus.marginatus            172
+ 7 Sarpa.salpa                       264
+ 8 Serranus.cabrilla                 422
+ 9 Serranus.scriba                   538
+10 Siganus.luridus                   278
+11 Siganus.rivulatus                 384
+12 Sparisoma.cretense                264</code></pre>
 </div>
 <details>
 <summary>Code</summary>
@@ -405,7 +389,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_temp =</span> <span class="fu">min</span>(temp),</span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_temp =</span> <span class="fu">max</span>(temp),</span>
@@ -415,39 +399,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code># A tibble: 1 x 3
   min_temp max_temp mean_temp
      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-1     16.8     23.0      20.5</code></pre>
+1     16.8     23.0      20.4</code></pre>
 </div>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sp_group) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_temp =</span> <span class="fu">min</span>(temp),</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_temp =</span> <span class="fu">max</span>(temp),</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_temp =</span> <span class="fu">mean</span>(temp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sp_group) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_temp =</span> <span class="fu">min</span>(temp),</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_temp =</span> <span class="fu">max</span>(temp),</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_temp =</span> <span class="fu">mean</span>(temp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 x 4
   sp_group   min_temp max_temp mean_temp
   &lt;chr&gt;         &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-1 Groupers       16.8     23.0      19.8
+1 Groupers       16.8     23.0      19.7
 2 Herbivores     16.9     23.0      21.2
-3 Seabreams      16.8     23.0      20.3</code></pre>
+3 Seabreams      16.8     23.0      20.2</code></pre>
 </div>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">col =</span> sp_group) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(guild_colours<span class="sc">$</span>grps, guild_colours<span class="sc">$</span>herb, guild_colours<span class="sc">$</span>dip)) <span class="sc">+</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">x =</span> temp, <span class="at">col =</span> sp_group) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(guild_colours<span class="sc">$</span>grps, guild_colours<span class="sc">$</span>herb, guild_colours<span class="sc">$</span>dip)) <span class="sc">+</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="data_desc_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
@@ -461,52 +443,49 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_depth =</span> <span class="fu">min</span>(depth),</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_depth =</span> <span class="fu">max</span>(depth),</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_depth =</span> <span class="fu">mean</span>(depth))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_depth =</span> <span class="fu">min</span>(depth),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_depth =</span> <span class="fu">max</span>(depth),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_depth =</span> <span class="fu">mean</span>(depth))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 x 3
   min_depth max_depth mean_depth
       &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-1       1.8        29       9.20</code></pre>
+1       1.8        29       9.10</code></pre>
 </div>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sp_group) <span class="sc">%&gt;%</span> </span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_depth =</span> <span class="fu">min</span>(depth),</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_depth =</span> <span class="fu">max</span>(depth),</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_depth =</span> <span class="fu">mean</span>(depth))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sp_group) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_depth =</span> <span class="fu">min</span>(depth),</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_depth =</span> <span class="fu">max</span>(depth),</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_depth =</span> <span class="fu">mean</span>(depth))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 x 4
   sp_group   min_depth max_depth mean_depth
   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-1 Groupers         2        28.2      10.9 
-2 Herbivores       1.8      29         8.81
-3 Seabreams        1.8      29         8.65</code></pre>
+1 Groupers         2        28.2      10.7 
+2 Herbivores       1.8      29         8.78
+3 Seabreams        1.8      29         8.55</code></pre>
 </div>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">x =</span> depth, <span class="at">fill =</span> sp_group) <span class="sc">+</span> <span class="fu">geom_histogram</span>() <span class="sc">+</span> </span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(guild_colours<span class="sc">$</span>grps, guild_colours<span class="sc">$</span>herb, guild_colours<span class="sc">$</span>dip)) <span class="sc">+</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reverse</span>()<span class="sc">+</span></span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()<span class="sc">+</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>sp_group) <span class="sc">+</span></span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">x =</span> depth, <span class="at">fill =</span> sp_group) <span class="sc">+</span> <span class="fu">geom_histogram</span>() <span class="sc">+</span> </span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(guild_colours<span class="sc">$</span>grps, guild_colours<span class="sc">$</span>herb, guild_colours<span class="sc">$</span>dip)) <span class="sc">+</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reverse</span>()<span class="sc">+</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()<span class="sc">+</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>sp_group) <span class="sc">+</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
@@ -523,50 +502,47 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_prod =</span> <span class="fu">min</span>(prod),</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_prod =</span> <span class="fu">max</span>(prod),</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_prod =</span> <span class="fu">mean</span>(prod))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_prod =</span> <span class="fu">min</span>(prod),</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_prod =</span> <span class="fu">max</span>(prod),</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_prod =</span> <span class="fu">mean</span>(prod))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 x 3
   min_prod max_prod mean_prod
      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-1 0.000263  0.00989   0.00272</code></pre>
+1 0.000263  0.00989   0.00266</code></pre>
 </div>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sp_group) <span class="sc">%&gt;%</span> </span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_prod =</span> <span class="fu">min</span>(prod),</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_prod =</span> <span class="fu">max</span>(prod),</span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_prod =</span> <span class="fu">mean</span>(prod))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sp_group) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_prod =</span> <span class="fu">min</span>(prod),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_prod =</span> <span class="fu">max</span>(prod),</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_prod =</span> <span class="fu">mean</span>(prod))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 x 4
   sp_group   min_prod max_prod mean_prod
   &lt;chr&gt;         &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-1 Groupers   0.000263  0.00989   0.00151
-2 Herbivores 0.000263  0.00989   0.00319
-3 Seabreams  0.000263  0.00989   0.00296</code></pre>
+1 Groupers   0.000263  0.00989   0.00147
+2 Herbivores 0.000263  0.00989   0.00316
+3 Seabreams  0.000263  0.00989   0.00290</code></pre>
 </div>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sp_group =</span> <span class="fu">ifelse</span>(species <span class="sc">%in%</span> groupers, <span class="st">"Groupers"</span>,</span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">ifelse</span>(species <span class="sc">%in%</span> diplodus, <span class="st">"Seabreams"</span>, <span class="st">"Herbivores"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">x =</span> prod, <span class="at">col =</span> sp_group, <span class="at">fill =</span> sp_group) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span> </span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(guild_colours<span class="sc">$</span>grps, guild_colours<span class="sc">$</span>herb, guild_colours<span class="sc">$</span>dip)) <span class="sc">+</span></span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(guild_colours<span class="sc">$</span>grps, guild_colours<span class="sc">$</span>herb, guild_colours<span class="sc">$</span>dip)) <span class="sc">+</span></span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">x =</span> prod, <span class="at">col =</span> sp_group, <span class="at">fill =</span> sp_group) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span> </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(guild_colours<span class="sc">$</span>grps, guild_colours<span class="sc">$</span>herb, guild_colours<span class="sc">$</span>dip)) <span class="sc">+</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(guild_colours<span class="sc">$</span>grps, guild_colours<span class="sc">$</span>herb, guild_colours<span class="sc">$</span>dip)) <span class="sc">+</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="data_desc_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
@@ -587,8 +563,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> sp.n, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
 <span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(site, mpa) <span class="sc">%&gt;%</span> </span>
 <span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(mpa) <span class="sc">%&gt;%</span> </span>
 <span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">SITE_count =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -597,14 +573,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code># A tibble: 2 x 2
   mpa   SITE_count
   &lt;lgl&gt;      &lt;int&gt;
-1 FALSE        193
-2 TRUE          13</code></pre>
+1 FALSE         48
+2 TRUE          14</code></pre>
 </div>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>med_clean <span class="sc">%&gt;%</span> </span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores)) <span class="sc">%&gt;%</span> </span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">c</span>(groupers, diplodus, herbivores), <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> sp.n, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
 <span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(site, trans, mpa) <span class="sc">%&gt;%</span> </span>
 <span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(mpa) <span class="sc">%&gt;%</span> </span>
 <span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">TRANSECT_count =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -613,8 +589,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code># A tibble: 2 x 2
   mpa   TRANSECT_count
   &lt;lgl&gt;          &lt;int&gt;
-1 FALSE            902
-2 TRUE             349</code></pre>
+1 FALSE            801
+2 TRUE             397</code></pre>
 </div>
 </div>
 </section>
@@ -627,55 +603,58 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(grps_mat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>          Epinephelus.costae Epinephelus.marginatus Serranus.cabrilla
-gdor_1562                  0                      0                 0
-gdor_1563                  0                      0                 0
-gdor_1564                  0                      0                 0
-gdor_1565                  0                      0                 0
-gdor_1566                  0                      0                 0
-gdor_1567                  0                      0                 0
-          Serranus.scriba     temp      depth     prod   mpa
-gdor_1562               0 1.228003 -0.8010765 2.061776  TRUE
-gdor_1563               0 1.228003 -1.0065244 2.061776  TRUE
-gdor_1564               0 1.228003 -0.4929046 2.061776  TRUE
-gdor_1565               0 1.228003 -1.3146962 2.061776 FALSE
-gdor_1566               0 1.228003 -0.6572630 2.061776 FALSE
-gdor_1567               0 1.228003 -0.6572630 2.061776 FALSE</code></pre>
+<pre><code># A tibble: 6 x 8
+  Epinephelus.costae Epinephelus.margin~ Serranus.cabril~ Serranus.scriba   temp
+               &lt;dbl&gt;               &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt;  &lt;dbl&gt;
+1             -0.203              -0.327            2.83           -0.644 -0.782
+2             -0.203              -0.327            0.286          -0.644 -0.782
+3             -0.203              -0.327            0.286          -0.644 -0.782
+4             -0.203               9.98             8.78            1.35  -0.782
+5             -0.203               2.25             6.23            3.35  -0.782
+6             -0.203               9.98             3.68            8.34  -0.782
+# ... with 3 more variables: depth &lt;dbl&gt;, prod &lt;dbl&gt;, mpa &lt;lgl&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dip_mat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>          Diplodus.annularis Diplodus.puntazzo Diplodus.sargus
-gdor_1562                  0                 0               5
-gdor_1563                  1                 0               4
-gdor_1564                  0                 0               7
-gdor_1565                  0                 0               2
-gdor_1566                  0                 0               4
-gdor_1567                  0                 0               0
-          Diplodus.vulgaris     temp      depth     prod   mpa
-gdor_1562                11 1.228003 -0.8010765 2.061776  TRUE
-gdor_1563                 0 1.228003 -1.0065244 2.061776  TRUE
-gdor_1564                 2 1.228003 -0.4929046 2.061776  TRUE
-gdor_1565                 0 1.228003 -1.3146962 2.061776 FALSE
-gdor_1566                 0 1.228003 -0.6572630 2.061776 FALSE
-gdor_1567                 0 1.228003 -0.6572630 2.061776 FALSE</code></pre>
+<pre><code># A tibble: 6 x 8
+  Diplodus.annularis Diplodus.puntazzo Diplodus.sargus Diplodus.vulgaris   temp
+               &lt;dbl&gt;             &lt;dbl&gt;           &lt;dbl&gt;             &lt;dbl&gt;  &lt;dbl&gt;
+1             -0.235            -0.184           0.357             0.110 -0.845
+2             -0.235            10.1             0.357             0.110 -0.845
+3             -0.235             3.24            0.647             1.98  -0.845
+4             -0.235             3.24            8.58             16.7   -0.845
+5             -0.235            -0.184           4.80             16.1   -0.845
+6             -0.235             3.24            3.64              7.70  -0.845
+# ... with 3 more variables: depth &lt;dbl&gt;, prod &lt;dbl&gt;, mpa &lt;lgl&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(herb_mat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>          Siganus.rivulatus Siganus.luridus Sarpa.salpa Sparisoma.cretense
-gdor_1562                10               0           0                  0
-gdor_1563                 6               0           0                  0
-gdor_1564                29               0           0                  0
-gdor_1565                 5               0           0                  0
-gdor_1566                 5               0           0                  0
-gdor_1567                11               0           0                  0
-               temp      depth     prod   mpa
-gdor_1562 0.8413704 -0.7703809 1.538865  TRUE
-gdor_1563 0.8413704 -0.9474875 1.538865  TRUE
-gdor_1564 0.8413704 -0.5047208 1.538865  TRUE
-gdor_1565 0.8413704 -1.2131475 1.538865 FALSE
-gdor_1566 0.8413704 -0.6464062 1.538865 FALSE
-gdor_1567 0.8413704 -0.6464062 1.538865 FALSE</code></pre>
+<pre><code># A tibble: 6 x 8
+  Siganus.rivulatus Siganus.luridus Sarpa.salpa Sparisoma.cretense  temp depth
+              &lt;dbl&gt;           &lt;dbl&gt;       &lt;dbl&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1            -0.302         -0.288       -0.117             -0.360 -1.01 2.42 
+2            -0.319         -0.288       -0.117              0.520 -1.01 2.42 
+3            -0.319         -0.288       -0.117              0.520 -1.01 2.42 
+4            -0.319         -0.288       -0.117              3.60  -1.01 2.42 
+5            -0.319         -0.0684      -0.117             -0.360 -1.01 0.849
+6            -0.319         -0.288       -0.117              0.960 -1.01 0.849
+# ... with 2 more variables: prod &lt;dbl&gt;, mpa &lt;lgl&gt;</code></pre>
 </div>
+</div>
+<p>Note that these are <strong>count</strong> data and we used <strong>biomass</strong> data for the models.</p>
+<p>Create coordinate datasets to run the spatial models</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>grps_cords <span class="ot">&lt;-</span> med_clean <span class="sc">%&gt;%</span> <span class="fu">filter</span>(species <span class="sc">%in%</span> groupers, <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> biomass, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(lon, lat)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>dip_cords <span class="ot">&lt;-</span> med_clean <span class="sc">%&gt;%</span> <span class="fu">filter</span>(species <span class="sc">%in%</span> diplodus, <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> biomass, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(lon, lat)</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>herb_cords <span class="ot">&lt;-</span> med_clean <span class="sc">%&gt;%</span> <span class="fu">filter</span>(species <span class="sc">%in%</span> herbivores, <span class="sc">!</span><span class="fu">is.na</span>(depth)) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> biomass, <span class="at">values_fill =</span> <span class="dv">0</span>, <span class="at">values_fn =</span> sum) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(lon, lat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
