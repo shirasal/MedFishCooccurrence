@@ -9,7 +9,6 @@ str(medata)
 
 # Create a dataset with relevant information, scaled covariates, and boolean MPA column:
 med_clean <- medata %>%
-  filter(data.origin != "azz_asi") %>% # presence-absence
   mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
          temp = tmean,
          depth = depth,
@@ -21,7 +20,6 @@ med_clean <- medata %>%
 medata %>% distinct(country)
 med_clean_east <- medata %>%
   filter(country == "Israel" | country == "Greece" | country == "Turkey") %>% 
-  filter(data.origin != "azz_asi") %>% # presence-absence
   mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
          temp = tmean,
          depth = depth,
