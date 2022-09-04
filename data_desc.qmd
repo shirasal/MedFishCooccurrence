@@ -1,0 +1,351 @@
+---
+title: "Describing the data"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    smooth-scroll: true
+    theme: yeti
+---
+
+```{r}
+#| echo: false
+#| output: false
+source("R/packages.R")
+source("R/assist_vectors.R")
+```
+
+```{r}
+#| echo: false
+#| cache: true
+medata <- read_rds("data/medata.Rds") %>% 
+  mutate(site = case_when(str_starts(site, "assecret") ~ 
+                            str_extract(site, "assecret\\d\\d\\d\\d\\d\\d\\d"),
+                          TRUE ~ as.character(site)))
+
+```
+
+# Overview of the data used for this research
+
+`med_clean` is the `medata` data set after the following treatment:
+
+-   filter out presence-absence data.
+-   categorise `mpa` to logical by enforcement level.
+-   `biomass` calculated using `sp.length`, which is the individual length recorded (estimated, in cm)
+-   selected relevant columns only and changed some variable names
+
+::: panel-tabset
+## Code
+
+```{r}
+#| cache: true
+med_clean <- medata %>%
+  filter(data.origin != "azz_asi") %>% # presence-absence
+  mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
+         temp = tmean,
+         prod = pp_mean,
+         biomass = (a*sp.length^b)*sp.n) %>%
+  select(site, lon, lat, trans, species, sp.n, biomass, mpa, temp, depth, prod)
+```
+
+## Data
+
+```{r}
+head(med_clean)
+```
+:::
+
+**Herbivores** require another filtering, since we only analyse data from overlapping zones, which is the eastern basin only.
+
+::: panel-tabset
+## Code
+
+```{r}
+med_clean_east <- medata %>%
+  filter(country == "Israel" | country == "Greece" | country == "Turkey") %>% # extra filtering - east med
+  filter(data.origin != "azz_asi") %>% # presence-absence
+  mutate(mpa = if_else(enforcement <= 1, FALSE, TRUE),
+         temp = tmean,
+         prod = pp_mean,
+         biomass = (a*sp.length^b)*sp.n) %>%
+  select(site, lon, lat, trans, species, sp.n, biomass, mpa, temp, depth, prod)
+
+```
+
+## Data
+
+```{r}
+head(med_clean_east)
+```
+:::
+
+# Formatting data into species matrices
+
+The model we are using ([`MRFcov`](https://github.com/nicholasjclark/MRFcov)) requires [data preparations](https://cran.r-project.org/web/packages/MRFcov/vignettes/CRF_data_prep.html):
+
+- Create a database where each row is a site and the columns contains the metadata, species (column per species) and the predictors.
+- Categorical variable - converted to factor with the correct levels.
+- Numeric variables - scaled (standardised here, with mean = 1 and standard deviation = 0).
+
+I created a function to create these data sets according to the data I wanted, with filtering to the species I wanted to focus on, the metric (counts/abundance or biomass), and the predictors I wanted to include:
+
+```{r}
+create_spp_mat <- function(dataset, guild, metric, covariate){
+  cols <- c(c("lat", "lon", "site", "trans", "species"), env_cov, mpa_cov)
+  if (metric == "sp.n" | metric == "abundance") {
+    dataset %>% 
+      group_by_at(.vars = cols) %>%
+      summarise(n = sum(sp.n), .groups = "drop") %>% 
+      spread(species, n, fill = 0) %>% 
+      # Add unique rownames that describe the site and transect:
+      mutate(loc = make.unique(paste(site, trans, sep = "_"))) %>% 
+      group_by(loc) %>%
+      column_to_rownames("loc") %>% 
+      filter(!is.na(depth)) %>% 
+      select(all_of(guild), all_of(covariate)) %>% 
+      mutate(across(.cols = all_of(env_cov), .fns = function(x){as.vector(scale(x))})) %>% 
+      ungroup()
+  } else if(metric == "biomass") {
+    dataset %>%
+      group_by_at(.vars = cols) %>%
+      summarise(n = sum(biomass), .groups = "drop") %>% 
+      spread(species, n, fill = 0) %>% 
+      # Add unique rownames that describe the site and transect:
+      mutate(loc = make.unique(paste(site, trans, sep = "_"))) %>% 
+      group_by(loc) %>%
+      column_to_rownames("loc") %>% 
+      filter(!is.na(depth)) %>% 
+      select(all_of(guild), all_of(covariate)) %>% 
+      mutate(across(.cols = c(all_of(guild),all_of(env_cov)), .fns = function(x){as.vector(scale(x))})) %>% 
+      ungroup()
+  } else {
+    stop("Metric should be either 'sp.n', 'abundance' or 'biomass'")
+  }
+}
+
+```
+
+## Locations
+```{r}
+#| code-fold: true
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(!is.na(depth)) %>% 
+  distinct(site, trans) %>% 
+  summarise(total_transects = n())
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  mutate(sp_group = ifelse(species %in% groupers, "Groupers",
+                           ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
+  filter(!is.na(depth)) %>% 
+  group_by(sp_group) %>% 
+  distinct(site, trans) %>% 
+  summarise(total_transects = n())
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  mutate(sp_group = ifelse(species %in% groupers, "Groupers",
+                           ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
+  filter(!is.na(depth)) %>% 
+  group_by(site) %>% distinct(trans) %>% 
+  summarise(total_transects = n())
+  
+
+```
+
+
+## Species groups
+We selected three groups of species ("`guilds`")
+```{r}
+dplyr::tibble(Groupers = groupers,
+              Seabreams = diplodus,
+              Herbivores = herbivores)
+```
+We ran the model on each data set **separately**.
+No species with under 10 observations were included.
+
+```{r}
+#| code-fold: true
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  mutate(sp_group = ifelse(species %in% groupers, "Groupers",
+                           ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
+  filter(!is.na(depth)) %>% 
+  arrange(sp_group) %>% 
+  group_by(species) %>% 
+  distinct(site,trans) %>% 
+  summarise(n_observations = n())
+# ggplot() + aes(x = temp, col = sp_group) + geom_density(size = 2) + 
+# scale_colour_manual(values = c(guild_colours$grps, guild_colours$herb, guild_colours$dip)) +
+# theme_bw() +
+# theme(legend.position = "top")
+```
+
+
+## Environmental predictors
+
+```{r}
+env_cov
+```
+
+- temp = Temperature
+- depth = Depth (suprising...)
+- prod = Primary productivity
+All of these predictors were standardised per analysis.
+
+### Temperature
+mean annual sea surface temperature (SST) at 9.2 km resolution (Tyberghein et al. 2012).
+unit: °C
+
+```{r}
+#| code-fold: true
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(!is.na(depth)) %>% 
+  summarise(min_temp = min(temp),
+            max_temp = max(temp),
+            mean_temp = mean(temp))
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(!is.na(depth)) %>% 
+  mutate(sp_group = ifelse(species %in% groupers, "Groupers",
+                           ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
+  group_by(sp_group) %>% 
+  summarise(min_temp = min(temp),
+            max_temp = max(temp),
+            mean_temp = mean(temp))
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  mutate(sp_group = ifelse(species %in% groupers, "Groupers",
+                           ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
+  filter(!is.na(depth)) %>% 
+  ggplot() + aes(x = temp, col = sp_group) + geom_density(size = 2) + 
+  scale_colour_manual(values = c(guild_colours$grps, guild_colours$herb, guild_colours$dip)) +
+  theme_bw() +
+  theme(legend.position = "top")
+
+```
+
+### Depth
+as recorded during the surveys.
+unit: meters
+
+```{r}
+#| code-fold: true
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(!is.na(depth)) %>% 
+  summarise(min_depth = min(depth),
+            max_depth = max(depth),
+            mean_depth = mean(depth))
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(!is.na(depth)) %>% 
+  mutate(sp_group = ifelse(species %in% groupers, "Groupers",
+                           ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
+  group_by(sp_group) %>% 
+  summarise(min_depth = min(depth),
+            max_depth = max(depth),
+            mean_depth = mean(depth))
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  mutate(sp_group = ifelse(species %in% groupers, "Groupers",
+                           ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
+  filter(!is.na(depth)) %>% 
+  ggplot() + aes(x = depth, fill = sp_group) + geom_histogram() + 
+  scale_fill_manual(values = c(guild_colours$grps, guild_colours$herb, guild_colours$dip)) +
+  scale_x_reverse()+
+  coord_flip()+
+  facet_wrap(~sp_group) +
+  theme_bw() + 
+  theme(legend.position = "none")
+
+```
+
+### Productivity
+mean annual primary productivity 9.2 km resolution (Tyberghein et al. 2012).
+unit: g∙m-3∙day-1.
+
+```{r}
+#| code-fold: true
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(!is.na(depth)) %>% 
+  summarise(min_prod = min(prod),
+            max_prod = max(prod),
+            mean_prod = mean(prod))
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(!is.na(depth)) %>% 
+  mutate(sp_group = ifelse(species %in% groupers, "Groupers",
+                           ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
+  group_by(sp_group) %>% 
+  summarise(min_prod = min(prod),
+            max_prod = max(prod),
+            mean_prod = mean(prod))
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  mutate(sp_group = ifelse(species %in% groupers, "Groupers",
+                           ifelse(species %in% diplodus, "Seabreams", "Herbivores"))) %>% 
+  filter(!is.na(depth)) %>% 
+  ggplot() + aes(x = prod, col = sp_group, fill = sp_group) + geom_density(alpha = .3) + 
+  scale_fill_manual(values = c(guild_colours$grps, guild_colours$herb, guild_colours$dip)) +
+  scale_colour_manual(values = c(guild_colours$grps, guild_colours$herb, guild_colours$dip)) +
+  theme_bw() + 
+  theme(legend.position = "top")
+
+```
+
+## Anthropogenic predictors
+
+```{r}
+mpa_cov
+```
+
+We used `MPA` (logical) as a sole anthropogenic pressure predictor. This predictor tells us about whether or not the sampled area is a Marine Protected Area (MPA) or not, and is determined by the enforcement level.
+
+```{r}
+#| code-fold: true
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(!is.na(depth)) %>% 
+  distinct(site, mpa) %>% 
+  group_by(mpa) %>% 
+  summarise(SITE_count = n())
+
+med_clean %>% 
+  filter(species %in% c(groupers, diplodus, herbivores)) %>% 
+  filter(!is.na(depth)) %>% 
+  distinct(site, trans, mpa) %>% 
+  group_by(mpa) %>% 
+  summarise(TRANSECT_count = n())
+
+```
+
+
+## Prepared data
+
+```{r}
+grps_mat <- create_spp_mat(dataset = med_clean, guild = groupers, metric = "sp.n", covariate = all_covs)
+dip_mat <- create_spp_mat(dataset = med_clean, guild = diplodus, metric = "sp.n", covariate = all_covs)
+herb_mat <- create_spp_mat(dataset = med_clean_east, guild = herbivores, metric = "sp.n", covariate = all_covs)
+
+head(grps_mat)
+head(dip_mat)
+head(herb_mat)
+
+```
+
+
+
