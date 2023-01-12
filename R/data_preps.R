@@ -38,9 +38,9 @@ write_rds(med_clean_east, "data/processed/med_clean_east.rds")
 
 my_data <- med_clean %>% 
   filter(species %in% c(groupers, diplodus, herbivores)) %>% 
-  mutate(sp_group = case_when(species %in% groupers ~ "Groupers",
-                              species %in% diplodus ~ "Seabreams",
-                              species %in% herbivores ~ "Herbivores")) %>% 
+  mutate(sp_group = case_when(species %in% guilds$groupers ~ "Groupers",
+                              species %in% guilds$diplodus ~ "Seabreams",
+                              species %in% guilds$herbivores ~ "Herbivores")) %>% 
   mutate(sp_group = factor(sp_group, levels = c("Groupers", "Seabreams", "Herbivores"))) %>% 
   mutate(col = case_when(sp_group == "Groupers" ~ "#c54607",
                          sp_group == "Seabreams" ~ "#145d82",
