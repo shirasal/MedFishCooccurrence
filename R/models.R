@@ -3,9 +3,9 @@ source("R/packages.R")
 source("R/functions.R")
 source("R/assist_vectors.R")
 
-matrices_mass <- list("data/processed/grps_mass_mat.rds",
-                      "data/processed/dip_mass_mat.rds",
-                      "data/processed/herb_mass_mat.rds")
+matrices_mass <- list("data/processed/grps_mat.rds",
+                      "data/processed/dip_mat.rds",
+                      "data/processed/herb_mat.rds")
 
 
 # Biomass models ----------------------------------------------------------
