@@ -1,12 +1,7 @@
 ############################### MODELS ###############################
 source("R/packages.R")
 source("R/functions.R")
-
-env_cov <- read_rds("data/all_covs.rds")[1:3]
-mpa_cov <- read_rds("data/all_covs.rds")[4]
-guild_colours <- read_rds("data/processed/guild_colours.rds")
-guilds <- read_rds("data/processed/guilds_list.rds")
-
+source("R/assist_vectors.R")
 
 matrices_mass <- list("data/processed/grps_mass_mat.rds",
                       "data/processed/dip_mass_mat.rds",
