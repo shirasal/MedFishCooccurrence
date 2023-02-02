@@ -3,7 +3,7 @@ library(sf)
 library(tidyverse)
 library(sdmpredictors) 
 
-med_shp <- sf::st_read("C:/Users/shira/Documents/MSc/GIS/Mediterranean Sea/Mediterranean_Sea_Area.shp")
+med_shp <- sf::st_read("~/MSc Paper/medata/Med_World_Seas_IHO_v3_MarineRegions/Medit_seas_IHO.shp")
 med_ext <- raster::extent(med_shp)
 
 # list_layers(marine = TRUE) %>% View
@@ -29,25 +29,25 @@ med_clean <- read_rds("data/processed/med_clean.rds")
 
 # Plot --------------------------------------------------------------------
 med_clean %>% 
-  mutate(mpa = ifelse(is.na(mpa), "Unknown", mpa)) %>% 
   ggplot() +
   aes(y = Latitude, x = Longitude) + 
   stat_contour(data = med_bathy_df, aes(z = Bathymetry), col = "lightgray") +
   geom_raster(data = med_temp_df, aes(fill = Temperature), alpha = .5) +
   scale_fill_gradientn(colours = c("#313695", "#ffffbf", "#a50026"), name = "Temperature °C") +
   # stat_sum(data = med_clean, aes(x = lon, y = lat, shape = mpa), alpha = .5) +
-  geom_point(aes(x = lon, y = lat, shape = mpa), size = 3,alpha = .5) + 
-  scale_shape_manual(values = c(4, 18, 1), 
-                     labels = c("Not protected", "Protected", "No protection data"), name = "Sampling sites") +
-  theme_bw() +
+  geom_point(aes(x = lon, y = lat, shape = mpa), size = 3, alpha = .5) + 
+  scale_shape_manual(values = c(4, 18), 
+                     labels = c("Not protected", "Protected"), name = "Sampling sites") +
   coord_quickmap() + 
+  theme_bw() +
   theme(axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size = 14, angle = 90),
         axis.text.x = element_text(size = 14),
         axis.text.y = element_text(size = 14),
-        panel.grid.major = element_blank(),
+        panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
-        legend.position = "right")
+        legend.position = "right",
+        plot.margin = grid::unit(c(0,0,0,0), "mm"))
 
-# ggsave("figures/med_map.png", device = "png", dpi = 150, scale = c(2,2))
+ggsave("figures/med_map.png", device = "png", dpi = 300, width = 14, height = 7, units = "in")
 
