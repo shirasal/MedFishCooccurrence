@@ -1,21 +1,21 @@
-############################### MODELS ###############################
-source("R/packages.R")
-source("R/functions.R")
+############################### MODELS ##############################
+# Run 'models.R' first
 
-env_cov <- read_rds("data/all_covs.rds")[1:3]
-mpa_cov <- read_rds("data/all_covs.rds")[4]
-guild_colours <- read_rds("data/processed/guild_colours.rds")
+source("R/create_spp_mat_function.R")
+med_clean <- read_rds("data/processed/med_clean.rds")
+med_clean_east <- read_rds("data/processed/med_clean_east.rds")
 
-matrices <- list("data/processed/grps_mat.rds",
-                 "data/processed/dip_mat.rds",
-                 "data/processed/herb_mat.rds")
+grps_abund <- create_spp_mat(dataset = med_clean, guild = groupers, metric = "abundance", covariate = all_covs)
+dip_abund <- create_spp_mat(dataset = med_clean, guild = diplodus, metric = "abundance", covariate = all_covs)
+herb_abund <- create_spp_mat(dataset = med_clean_east, guild = herbivores, metric = "abundance", covariate = all_covs)
+
+abund_mats <- list(grps_abund, dip_abund, herb_abund)
+
+names(abund_mats) <- c("grps_mat", "dip_mat", "herb_mat")
 
 # Nonspatial Poisson CRF --------------------------------------------------
 
-species_mats <- lapply(matrices, read_rds)
-names(species_mats) <- c("grps_mat", "dip_mat", "herb_mat")
-
-poisson_models <- lapply(species_mats, function(x){MRFcov(x, n_nodes = 4, family = "poisson")})
+poisson_models <- lapply(abund_mats, function(x){MRFcov(x, n_nodes = 4, family = "poisson")})
 names(poisson_models) <- c("grps_pois", "dip_pois", "herb_pois")
 
 
@@ -24,9 +24,9 @@ names(poisson_models) <- c("grps_pois", "dip_pois", "herb_pois")
 pois_relimp <- lapply(poisson_models, rel_imp_sum)
 names(pois_relimp) <- c("grps_pois_relimp", "dip_pois_relimp", "herb_pois_relimp")
 
-p_relimp_grps_pois <- pois_relimp$grps_pois_relimp %>% select(-`NA`) %>% plot_relimp("grps", "Groupers")
-p_relimp_dip_pois <- pois_relimp$dip_pois_relimp %>% select(-`NA`) %>% plot_relimp("dip", "Seabreams")
-p_relimp_herb_pois <- pois_relimp$herb_pois_relimp %>% select(-`NA`) %>% plot_relimp("herb", "Herbivores")
+p_relimp_grps_pois <- pois_relimp$grps_pois_relimp %>% plot_relimp("grps", "Groupers")
+p_relimp_dip_pois <- pois_relimp$dip_pois_relimp %>% plot_relimp("dip", "Seabreams")
+p_relimp_herb_pois <- pois_relimp$herb_pois_relimp %>% plot_relimp("herb", "Herbivores")
 
 # ggsave(plot = p_relimp_grps_pois, filename = "figures/relimp_grps_pois_nonspat.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
