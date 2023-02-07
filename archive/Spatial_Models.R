@@ -81,11 +81,11 @@ p_relimp_dip_mass <- mass_relimp$dip_mass_relimp %>% select(-`NA`) %>%
 p_relimp_herb_mass <- mass_relimp$herb_mass_relimp %>% select(-`NA`) %>% 
   plot_relimp(guild_col = "herb", guild_name = "Herbivores")
 
-# ggsave(plot = p_relimp_grps_mass, filename = "figures/mass/relimp_grps_mass.png", device = "png",
+# ggsave(plot = p_relimp_grps_mass, filename = "figures/relimp_grps_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
-# ggsave(plot = p_relimp_dip_mass, filename = "figures/mass/relimp_dip_mass.png", device = "png",
+# ggsave(plot = p_relimp_dip_mass, filename = "figures/relimp_dip_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
-# ggsave(plot = p_relimp_herb_mass, filename = "figures/mass/relimp_herb_mass.png", device = "png",
+# ggsave(plot = p_relimp_herb_mass, filename = "figures/relimp_herb_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
 
 (patch_plot_mass <- p_relimp_grps_mass / p_relimp_dip_mass / p_relimp_herb_mass)
