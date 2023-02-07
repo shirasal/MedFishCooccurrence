@@ -1,6 +1,7 @@
 # source("R/packages.R")
 
-### Summarise the relative importance of each type of covariate for each species
+# Relative importance summary ---------------------------------------------
+# Summarise the relative importance of each type of covariate for each species
 rel_imp_sum <- function(guild_mod){
   lapply(guild_mod$key_coefs, function(x) {
     if (nrow(x) == 0) return(tibble(cov_type = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
@@ -17,7 +18,7 @@ rel_imp_sum <- function(guild_mod){
     pivot_wider(id_cols = species, names_from = cov_type, values_from = sum_rel_imp, values_fill = 0)
 }
 
-### Plot relative importance of covariates by covariate for each species, within guild:
+# Plot relative importance of covariates by covariate for each species, within guild:
 plot_relimp <- function(rel_imp_df, guild_col, guild_name){
   # Tibble for the facet names and their order:
   cov_titles <- tibble(covariate = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
@@ -45,7 +46,10 @@ plot_relimp <- function(rel_imp_df, guild_col, guild_name){
           plot.margin = margin(.2,1,.2,1, "cm"))
 }
 
-### Plot overall (mean) networks
+
+# Plot networks -----------------------------------------------------------
+
+# Plot overall (mean) networks
 plot_graph <- function(guild_mod, plot_title){
   net_cols <- c(neg = '#FF3333', pos = '#3399CC')
   net <- igraph::graph.adjacency(guild_mod$graph, weighted = T, mode = "undirected")
@@ -53,7 +57,7 @@ plot_graph <- function(guild_mod, plot_title){
   deg <- igraph::degree(net, mode = "all")
   ggraph(net, layout = "circle") + 
     geom_edge_link(aes(width = weights, color = weights < 0), lineend = "round", linejoin = "round") +
-    # scale_edge_width(range = c(0, 3)) +
+    scale_edge_width(range = c(0, 3)) +
     scale_edge_color_manual(values = c(net_cols[["pos"]], net_cols[["neg"]])) +
     geom_node_point(aes(size = deg), col = "grey", alpha = 0.5) +
     geom_node_text(aes(label = str_replace(name, "\\.", "\\ ")), repel = TRUE, check_overlap = TRUE, 
@@ -64,10 +68,10 @@ plot_graph <- function(guild_mod, plot_title){
           panel.background = element_blank())
 }
 
-### Plot networks for temperature gradient (continuous)
+# Plot networks for temperature gradient (continuous)
 plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate){
   #### Function to create network graphs
-  create_netgraph  <- function(matrix, node_names, predictor_value){
+  create_netgraph <- function(matrix, node_names, predictor_value){
     
     # Create the adjacency network graph
     comm.net <- igraph::graph.adjacency(matrix, weighted = T, mode = "undirected")
@@ -77,14 +81,14 @@ plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate){
     igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
                                         cols[["neg"]],
                                         cols[["pos"]])
-    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight)
-    igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
+    igraph::E(comm.net)$width <- exp(abs(igraph::E(comm.net)$weight))
+    igraph::V(comm.net)$label <- str_replace(node_names, ".*\\.", paste0(substr(node_names, start = 1, stop = 1), ". "))
     igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
     
     # Create the network plot
     net.plot <- plot(comm.net,
                      layout = igraph::layout.circle,
-                     vertex.label.cex = 1.2,
+                     vertex.label.cex = 2,
                      vertex.frame.color = grDevices::adjustcolor("grey", alpha.f = .6),
                      vertex.shape = "circle",
                      vertex.label.family = "sans",
@@ -140,8 +144,8 @@ plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate){
     igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
                                         cols[["neg"]],
                                         cols[["pos"]])
-    igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight)
-    igraph::V(comm.net)$label <- str_replace(node_names, "\\.", "\\ ")
+    igraph::E(comm.net)$width <- exp(abs(igraph::E(comm.net)$weight))
+    igraph::V(comm.net)$label <- str_replace(node_names, ".*\\.", paste0(substr(node_names, start = 1, stop = 1), ". "))
     igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
     
     # Create the network plot
@@ -175,7 +179,7 @@ plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate){
   observed_cov_unique <- as.numeric(unique(observed_cov_values, na.rm = T))
   
   #### Create a gridded plot object to plot the three networks
-  graphics::par(mfrow = c(1, length(observed_cov_unique)), mar = c(1,3,1,3))
+  graphics::par(mfrow = c(1, length(observed_cov_unique)), mar = c(0,3,0,3))
   cont.cov.mats <- lapply(observed_cov_unique, function(j){
     pred_values <- (covariate_matrix * j) + baseinteraction_matrix
     net.plot <- create_netgraph(matrix = pred_values, node_names = node_names, predictor_value = as.logical(j))
