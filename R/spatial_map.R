@@ -40,14 +40,12 @@ med_clean %>%
                      labels = c("Not protected", "Protected"), name = "Locations") +
   coord_quickmap() + 
   theme_bw() +
-  theme(axis.title.x = element_text(size = 14),
-        axis.title.y = element_text(size = 14, angle = 90),
-        axis.text.x = element_text(size = 14),
-        axis.text.y = element_text(size = 14),
+  theme(text = element_text(size = 14),
+        axis.title.y = element_text(angle = 90),
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         legend.position = "right",
         plot.margin = grid::unit(c(0,0,0,0), "mm"))
 
-ggsave("figures/med_map.png", device = "png", dpi = 300, width = 14, height = 7, units = "in")
+ggsave("figures/med_map.png", device = "png", dpi = 150, width = 14, height = 7, units = "in")
 
