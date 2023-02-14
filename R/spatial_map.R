@@ -37,7 +37,7 @@ med_clean %>%
   # stat_sum(data = med_clean, aes(x = lon, y = lat, shape = mpa), alpha = .5) +
   geom_point(aes(x = lon, y = lat, shape = mpa), size = 3, alpha = .5) + 
   scale_shape_manual(values = c(4, 18), 
-                     labels = c("Not protected", "Protected"), name = "Sampling sites") +
+                     labels = c("Not protected", "Protected"), name = "Locations") +
   coord_quickmap() + 
   theme_bw() +
   theme(axis.title.x = element_text(size = 14),
