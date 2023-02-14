@@ -3,6 +3,8 @@ source("R/packages.R")
 source("R/functions.R")
 source("R/assist_vectors.R")
 
+# NOTE: THE MODELS DISPLAYED IN THE PAPER ARE THE SPATIAL MODELS ("R/biomass_spatial_models.R")
+
 matrices_mass <- list("data/processed/grps_mat.rds",
                       "data/processed/dip_mat.rds",
                       "data/processed/herb_mat.rds")
@@ -37,11 +39,11 @@ p_relimp_dip_mass <- mass_relimp$dip_mass_relimp %>% select(-`NA`) %>%
 p_relimp_herb_mass <- mass_relimp$herb_mass_relimp %>% select(-`NA`) %>% 
   plot_relimp(guild_col = "herb", guild_name = "Herbivores")
 
-# ggsave(plot = p_relimp_grps_mass, filename = "figures/relimp_grps_mass.png", device = "png",
+# ggsave(plot = p_relimp_grps_mass, filename = "figures/appendix/appendix/relimp_grps_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
-# ggsave(plot = p_relimp_dip_mass, filename = "figures/relimp_dip_mass.png", device = "png",
+# ggsave(plot = p_relimp_dip_mass, filename = "figures/appendix/appendix/relimp_dip_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
-# ggsave(plot = p_relimp_herb_mass, filename = "figures/relimp_herb_mass.png", device = "png",
+# ggsave(plot = p_relimp_herb_mass, filename = "figures/appendix/appendix/relimp_herb_mass.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
 
 (patch_plot_mass <- p_relimp_grps_mass / p_relimp_dip_mass / p_relimp_herb_mass)
@@ -51,8 +53,8 @@ patch_plot_mass[[2]] <- patch_plot_mass[[2]] + theme(axis.title.y = element_text
 patch_plot_mass[[3]] <- patch_plot_mass[[3]] + theme(axis.title.y = element_blank())
 
 patch_plot_mass
-# ggsave("figures/rel_imp_mass.png", device = "png", dpi = 150, height = 10, width = 10, units = "in")
-# ggsave("figures/rel_imp_mass.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
+# ggsave("figures/appendix/appendix/rel_imp_mass.png", device = "png", dpi = 150, height = 10, width = 10, units = "in")
+# ggsave("figures/appendix/appendix/rel_imp_mass.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
 
 
 ## Nonstationarity ---------------------------------------------------------
