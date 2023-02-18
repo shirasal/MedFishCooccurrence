@@ -30,6 +30,7 @@ nrow(dip_mat) == nrow(dip_coords)
 nrow(herb_mat) == nrow(herb_coords)
 
 species_mats <- list(grps_mat, dip_mat, herb_mat)
+names(species_mats) <- c("grps", "dip", "herb")
 
 coord_dfs <- list(grps_coords, dip_coords, herb_coords)
 
@@ -52,13 +53,13 @@ spat_relimp$dip
 spat_relimp$herb
 
 p_relimp_grps_spat <- spat_relimp$grps %>% 
-  plot_relimp(guild_col = "grps", guild_name = "Groupers")
+  plot_relimp(guild_col = "grps", guild_name = "(A) Groupers")
 
 p_relimp_dip_spat <- spat_relimp$dip %>% select(-`NA`) %>% 
-  plot_relimp(guild_col = "dip", guild_name = "Seabreams")
+  plot_relimp(guild_col = "dip", guild_name = "(B) Seabreams")
 
 p_relimp_herb_spat <- spat_relimp$herb %>% select(-`NA`) %>% 
-  plot_relimp(guild_col = "herb", guild_name = "Herbivores")
+  plot_relimp(guild_col = "herb", guild_name = "(C) Herbivores")
 
 # ggsave(plot = p_relimp_grps_spat, filename = "figures/relimp_grps_spat.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")
@@ -74,17 +75,17 @@ patch_plot_spat[[2]] <- patch_plot_spat[[2]] + theme(axis.title.y = element_text
 patch_plot_spat[[3]] <- patch_plot_spat[[3]] + theme(axis.title.y = element_blank())
 
 patch_plot_spat
-ggsave("figures/rel_imp_spat.png", device = "png", dpi = 150, height = 10, width = 10, units = "in")
-ggsave("figures/rel_imp_spat.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
+# ggsave("figures/rel_imp_spat.png", device = "png", dpi = 150, height = 10, width = 10, units = "in")
+# ggsave("figures/rel_imp_spat.pdf", device = "pdf", dpi = 150, height = 10, width = 10, units = "in")
 
 ## Nonstationarity ---------------------------------------------------------
 
-all_relimp_mass <- list(grps = mass_relimp$grps_mass_relimp,
-                        dip = mass_relimp$dip_mass_relimp,
-                        herb = mass_relimp$herb_mass_relimp)
+all_relimp_spat <- list(grps = spat_relimp$grps,
+                        dip = spat_relimp$dip,
+                        herb = spat_relimp$herb)
 
 # Compare stationary and nonstationary effects:
-lapply(all_relimp_mass, function(x){
+lapply(all_relimp_spat, function(x){
   cov_titles <- tibble(covariate = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
                        facet.title = factor(c("Environment", "MPA", "Biotic Associations",
                                               "Temp * Biotic", "MPA * Biotic"),

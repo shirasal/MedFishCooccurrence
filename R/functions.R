@@ -43,7 +43,8 @@ plot_relimp <- function(rel_imp_df, guild_col, guild_name){
     theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "italic"), strip.placement = "outside",
           axis.title.x = element_blank(), 
           strip.text.x = element_text(size = 12, face = "bold"),
-          plot.margin = margin(.2,1,.2,1, "cm"))
+          plot.margin = margin(.2,1,.2,1, "cm"),
+          plot.title = element_text(size = 16))
 }
 
 
@@ -57,10 +58,11 @@ plot_graph <- function(guild_mod, plot_title){
   deg <- igraph::degree(net, mode = "all")
   ggraph(net, layout = "circle") + 
     geom_edge_link(aes(width = weights, color = weights < 0), lineend = "round", linejoin = "round") +
-    scale_edge_width(range = c(0, 3)) +
+    scale_edge_width(range = c(0, 2)) +
     scale_edge_color_manual(values = c(net_cols[["pos"]], net_cols[["neg"]])) +
     geom_node_point(aes(size = deg), col = "grey", alpha = 0.5) +
-    geom_node_text(aes(label = str_replace(name, "\\.", "\\ ")), repel = TRUE, check_overlap = TRUE, 
+    geom_node_text(aes(label = str_replace(name, ".*\\.", paste0(substr(name, start = 1, stop = 1), ". "))), 
+                       repel = TRUE, check_overlap = TRUE, 
                    point.padding = unit(0.2, "lines"), fontface = "italic") +
     ggtitle(plot_title) +
     theme(legend.position = "none",
