@@ -57,7 +57,7 @@ plot_graph <- function(guild_mod, plot_title, cutoff){
     cutoff <- 0
   }
   
-  net_cols <- c(neg = '#FF3333', pos = '#3399CC')
+  net_cols <- c(neg = "#FF3333", pos = "#3399CC")
   net <- igraph::graph.adjacency(guild_mod$graph, weighted = T, mode = "undirected")
   net <- igraph::delete.edges(net, which(abs(igraph::E(net)$weight) <= cutoff))
   weights <- igraph::E(net)$weight
@@ -80,7 +80,7 @@ plot_graph <- function(guild_mod, plot_title, cutoff){
 plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate,
                              main, cutoff, plot){
   
-  if(MRF_mod$mod_type == 'MRFcov'){
+  if(MRF_mod$mod_type == "MRFcov"){
     plot_booted_coefs <- FALSE
   } else {
     plot_booted_coefs <- TRUE
@@ -91,9 +91,7 @@ plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate,
   }
   
   if(missing(main)){
-    main <- paste('Estimated node interactions at increasing',
-                  covariate,
-                  'magnitudes')
+    main <- ""
   }
   
   if(missing(cutoff)){
@@ -207,7 +205,7 @@ plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate,
   
   # If plot = FALSE, return the list of 
   if(!plot){
-    names(cont.cov.mats) <- c('Min', 'Median', 'Max')
+    names(cont.cov.mats) <- c("Min", "Median", "Max")
     cont.cov.mats
   } else {
     
