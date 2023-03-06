@@ -50,44 +50,14 @@ plot_relimp <- function(rel_imp_df, guild_col, guild_name){
 
 # Plot networks -----------------------------------------------------------
 
-# Plot overall (mean) networks
-plot_graph <- function(guild_mod, plot_title, cutoff){
-  
-  if(missing(cutoff)){
-    cutoff <- 0
-  }
-  
-  net_cols <- c(neg = "#FF3333", pos = "#3399CC")
-  net <- igraph::graph.adjacency(guild_mod$graph, weighted = T, mode = "undirected")
-  net <- igraph::delete.edges(net, which(abs(igraph::E(net)$weight) <= cutoff))
-  weights <- igraph::E(net)$weight
-  deg <- igraph::degree(net, mode = "all")
-  ggraph(net, layout = "circle") + 
-    geom_edge_link(aes(width = weights, color = weights < 0), lineend = "round", linejoin = "round", show.legend = TRUE) +
-    scale_edge_width_continuous(range = c(0, 2)) +
-    scale_edge_color_manual(values = c(net_cols[["pos"]], net_cols[["neg"]])) +
-    geom_node_point(aes(size = deg), col = "grey", alpha = 0.5) +
-    geom_node_text(aes(label = str_replace(name, ".*\\.", paste0(substr(name, start = 1, stop = 1), ". "))), 
-                   repel = TRUE, check_overlap = TRUE, 
-                   point.padding = unit(0.2, "lines"), fontface = "italic") +
-    ggtitle(plot_title) +
-    theme(legend.position = "none",
-          aspect.ratio = 1,
-          panel.background = element_blank())
-}
-
-# Plot networks for temperature gradient (continuous)
-plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate,
-                             main, cutoff, plot){
+plotMRF_net <- function(data, MRF_mod, node_names, covariate,
+                        main, cutoff, plot, type){
+  dev.off()
   
   if(MRF_mod$mod_type == "MRFcov"){
     plot_booted_coefs <- FALSE
   } else {
     plot_booted_coefs <- TRUE
-  }
-  
-  if(missing(plot)){
-    plot <- TRUE
   }
   
   if(missing(main)){
@@ -96,45 +66,6 @@ plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate,
   
   if(missing(cutoff)){
     cutoff <- 0
-  }
-  
-  #### Function to create network graphs
-  create_netgraph = function(matrix, node_names, cutoff, plot){
-    
-    # Create the adjacency network graph
-    comm.net <- igraph::graph.adjacency(matrix, weighted = T, mode = "undirected")
-    
-    # If plot = FALSE, return the weighted adjacency matrix
-    if(!plot){
-      net.plot <- comm.net
-    } else {
-      
-      # If plot = TRUE, create the network plot
-      # Specify edge colours
-      cols <- c(neg = "#FF3333", pos = "#3399CC")
-      igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
-                                          cols[["neg"]],
-                                          cols[["pos"]])
-      comm.net <- igraph::delete.edges(comm.net, which(abs(igraph::E(comm.net)$weight) <= cutoff))
-      igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight) * 1.75
-      igraph::V(comm.net)$label <- str_replace(node_names, ".*\\.", paste0(substr(node_names, start = 1, stop = 1), ". "))
-      igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .7)
-      
-      # Create the network plot
-      graphics::par(mar = c(0, 2, 0, 2))
-      net.plot <- plot(comm.net,
-                       layout = igraph::layout.circle,
-                       vertex.label.cex = 1.6,
-                       vertex.shape = "none",
-                       vertex.label.family = "sans",
-                       vertex.label.font = 3,
-                       vertex.label.color = "black",
-                       edge.label = round(igraph::E(comm.net)$weight, 2),
-                       edge.label.cex = 1.5,
-                       edge.label.family = "sans",
-                       edge.label.color = "darkgray")
-    }
-    return(net.plot)
   }
   
   if(!plot_booted_coefs){
@@ -180,98 +111,60 @@ plotMRF_net_cont <- function(data, MRF_mod, node_names, covariate,
     
   }
   
-  #### Extract quantiles of observed values for the covariate ####
-  observed_cov_values <- as.vector(data[[paste(covariate)]])
-  observed_cov_quantiles <- quantile(observed_cov_values,
-                                     probs = c(0, 0.5, 1), na.rm = T)
-  
-  #If number of unique values is low, quantiles may be identical. Instead,
-  #generate a sequence of 10 simulated values from the observed min to the observed max
-  if(length(unique(observed_cov_quantiles)) < 3){
-    observed_cov_quantiles <- quantile(seq(min(observed_cov_values),
-                                           max(observed_cov_values),
-                                           length.out = 10),
+  if (type == "cont") {
+    #### Extract quantiles of observed values for the covariate ####
+    observed_cov_values <- as.vector(data[[paste(covariate)]])
+    observed_cov_quantiles <- quantile(observed_cov_values,
                                        probs = c(0, 0.5, 1), na.rm = T)
-  }
-  
-  #### Create a gridded plot object to plot the three networks
-  graphics::par(mfrow = c(1, length(observed_cov_quantiles)))
-  cont.cov.mats <- lapply(observed_cov_quantiles, function(j){
-    pred_values <- (covariate_matrix * j) + baseinteraction_matrix
-    net.plot <- create_netgraph(matrix = pred_values,
-                                node_names = node_names,
-                                cutoff = cutoff, plot = plot)
-  })
-  
-  # If plot = FALSE, return the list of 
-  if(!plot){
-    names(cont.cov.mats) <- c("Min", "Median", "Max")
-    cont.cov.mats
-  } else {
     
-    # If plot = TRUE, add text and arrows to the plot and return
-    graphics::arrows(x0 = -5.3, y0 = 1.4, x1 = 0,
-                     y1 = 1.4, xpd = NA, length = 0.1)
-    graphics::mtext(main, side = 3,
-                    line = -2, outer = T, cex = 1.2)
+    #If number of unique values is low, quantiles may be identical. Instead,
+    #generate a sequence of 10 simulated values from the observed min to the observed max
+    if(length(unique(observed_cov_quantiles)) < 3){
+      observed_cov_quantiles <- quantile(seq(min(observed_cov_values),
+                                             max(observed_cov_values),
+                                             length.out = 10),
+                                         probs = c(0, 0.5, 1), na.rm = T)
+    }
+    
+    #### Create a gridded plot object to plot the three networks
+    graphics::par(mfrow = c(1, length(observed_cov_quantiles)))
+    cont.cov.mats <- lapply(observed_cov_quantiles, function(j){
+      pred_values <- (covariate_matrix * j) + baseinteraction_matrix
+      net.plot <- create_netgraph(matrix = pred_values,
+                                  node_names = node_names,
+                                  cutoff = cutoff,
+                                  predictor_value = NULL)
+    })
+    
   }
+  
+  if (type == "factor") {
+    #### Extract quantiles of observed values for the covariate ####
+    observed_cov_values <- as.vector(data[[paste(covariate)]])
+    observed_cov_unique <- as.numeric(unique(observed_cov_values, na.rm = T))
+    
+    #If number of unique values is low, quantiles may be identical, throw warning:
+    if(length(unique(observed_cov_values)) < 2){
+      warning("Less than 2 quantiles, network may be identical") 
+    }
+    
+    #### Create a gridded plot object to plot the three networks
+    graphics::par(mfrow = c(1, length(observed_cov_unique)))
+    cont.cov.mats <- lapply(observed_cov_unique, function(j){
+      pred_values <- (covariate_matrix * j) + baseinteraction_matrix
+      net.plot <- create_netgraph(matrix = pred_values, cutoff = cutoff, node_names = node_names, 
+                                  predictor_value = as.logical(j))
+    })
+  }
+  
+  if (type == "all") {
+    graphics::par(mfrow = c(1,1))
+    pred_values <-  0 * covariate_matrix + baseinteraction_matrix
+    net.plot <- create_netgraph(matrix = pred_values, cutoff = cutoff, node_names = node_names, 
+                                predictor_value = T)
+  }
+  
 }
-
-### Plot networks for MPA (factor)
-plotMRF_net_factor <- function(data, MRF_mod, node_names, covariate){
-  #### Function to create network graphs
-  create_netgraph  <- function(matrix, node_names, predictor_value){
-    
-    # Create the adjacency network graph
-    comm.net <- igraph::graph.adjacency(matrix, weighted = T, mode = "undirected")
-    # Specify edge colours
-    cols <- c(neg = "#FF3333", pos = "#3399CC")
-    
-    igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
-                                        cols[["neg"]],
-                                        cols[["pos"]])
-    igraph::E(comm.net)$width <- exp(abs(igraph::E(comm.net)$weight))
-    igraph::V(comm.net)$label <- str_replace(node_names, ".*\\.", paste0(substr(node_names, start = 1, stop = 1), ". "))
-    igraph::V(comm.net)$color <- grDevices::adjustcolor("grey", alpha.f = .6)
-    
-    # Create the network plot
-    # graphics::par(mar = c(0,3,0,3))
-    net.plot <- plot(comm.net,
-                     layout = igraph::layout.circle,
-                     vertex.label.cex = 1.2,
-                     vertex.frame.color = grDevices::adjustcolor("grey", alpha.f = .6),
-                     vertex.shape = "circle",
-                     vertex.label.family = "sans",
-                     vertex.label.font = 3,
-                     vertex.label.color = "black",
-                     main = predictor_value)
-    return(net.plot)
-  }
-  
-  interaction_coefficients <- MRF_mod$graph
-  
-  #### Specify default parameter settings ####
-  dimnames(interaction_coefficients) <- list(node_names, node_names)
-  
-  #### Extract indirect effect matrix that matches the covariate name ####
-  indirect_coef_names <- names(MRF_mod$indirect_coefs)
-  which_matrix_keep <- grepl(covariate, indirect_coef_names)
-  covariate_matrix <- MRF_mod$indirect_coefs[which_matrix_keep]
-  covariate_matrix <- as.matrix(covariate_matrix[[1]][[1]])
-  baseinteraction_matrix <- as.matrix(MRF_mod$graph)
-  
-  #### Extract quantiles of observed values for the covariate ####
-  observed_cov_values <- as.vector(data[[paste(covariate)]])
-  observed_cov_unique <- as.numeric(unique(observed_cov_values, na.rm = T))
-  
-  #### Create a gridded plot object to plot the three networks
-  graphics::par(mfrow = c(1, length(observed_cov_unique)), mar = c(0,3,0,3))
-  cont.cov.mats <- lapply(observed_cov_unique, function(j){
-    pred_values <- (covariate_matrix * j) + baseinteraction_matrix
-    net.plot <- create_netgraph(matrix = pred_values, node_names = node_names, predictor_value = as.logical(j))
-  })
-}
-
 
 # Improved MRFcov cv.pred for Poisson Deviance ----------------------------
 
