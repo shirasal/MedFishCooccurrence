@@ -56,7 +56,7 @@ plotMRF_net(data = species_mats$dip, MRF_mod = spatial_models$dip_spat,
 dev.off()
 
 # Herbivores
-png(filename = "figures/networks/herbivores_net_mpa_mass.png", res = 150, width = 12, height = 3.7, units = "in")
+png(filename = "figures/networks/herbivores_net_mpa_mass.png", res = 150, width = 8, height = 5, units = "in")
 plotMRF_net(data = species_mats$herb, MRF_mod = spatial_models$herb_spat, node_names = guilds$herbivores, 
                  covariate = all_covs[4], cutoff = 0.03, type = "factor")
 dev.off()
