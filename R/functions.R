@@ -50,10 +50,11 @@ plot_relimp <- function(rel_imp_df, guild_col, guild_name){
 
 # Plot networks -----------------------------------------------------------
 
+# For type="all" the covariate doesn't matter, can by any
+# type options: "all" = mean network; "cont" = continuous gradient (such as temp); "factor" = like MPA
 plotMRF_net <- function(data, MRF_mod, node_names, covariate,
                         main, cutoff, plot, type){
-  dev.off()
-  
+
   if(MRF_mod$mod_type == "MRFcov"){
     plot_booted_coefs <- FALSE
   } else {
@@ -165,6 +166,7 @@ plotMRF_net <- function(data, MRF_mod, node_names, covariate,
   }
   
 }
+
 
 # Improved MRFcov cv.pred for Poisson Deviance ----------------------------
 
