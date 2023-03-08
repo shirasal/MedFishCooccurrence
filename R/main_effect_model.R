@@ -1,10 +1,11 @@
-# Run the beginning of 'models.R' first
+
+source("R/2 biomass_spatial_models.R", echo = TRUE)
 
 n_nodes = 4
 
 # Groupers ----------------------------------------------------------------
 
-grps_dat <- species_mats_mass$grps_mass_mat
+grps_dat <- species_mats$grps
 
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
@@ -28,7 +29,7 @@ grps_noint_relimp <- rel_imp_sum(grps_no_int)
 
 # Seabreams ---------------------------------------------------------------
 
-dip_dat <- species_mats_mass$dip_mass_mat
+dip_dat <- species_mats$dip
 
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
@@ -52,7 +53,7 @@ dip_noint_relimp <- rel_imp_sum(dip_no_int)
 
 # Herbivores --------------------------------------------------------------
 
-herb_dat <- species_mats_mass$herb_mass_mat
+herb_dat <- species_mats$herb
 
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
@@ -94,11 +95,12 @@ p_relimp_grps_noint <- grps_noint_relimp %>%
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = guild_colours$grps) +
   facet_wrap(~facet.title, nrow = 1) +
-  labs(subtitle = "Groupers", y = "Relative Importance (prop.)") +
+  labs(subtitle = "(A) Groupers", y = "Relative Importance (prop.)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "italic"), strip.placement = "outside",
         axis.title.x = element_blank(), 
         strip.text.x = element_text(size = 12, face = "bold"),
-        plot.margin = margin(.2,1,.2,1, "cm"))
+        plot.margin = margin(.2,1,.2,1, "cm"),
+        plot.title = element_text(size = 16))
 
 
 p_relimp_dip_noint <- dip_noint_relimp %>%
@@ -113,11 +115,12 @@ p_relimp_dip_noint <- dip_noint_relimp %>%
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = guild_colours$dip) +
   facet_wrap(~facet.title, nrow = 1) +
-  labs(subtitle = "Seabreams", y = "Relative Importance (prop.)") +
+  labs(subtitle = "(B) Seabreams", y = "Relative Importance (prop.)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "italic"), strip.placement = "outside",
         axis.title.x = element_blank(), 
         strip.text.x = element_text(size = 12, face = "bold"),
-        plot.margin = margin(.2,1,.2,1, "cm"))
+        plot.margin = margin(.2,1,.2,1, "cm"),
+        plot.title = element_text(size = 16))
 
 p_relimp_herb_noint <- herb_noint_relimp %>%
   pivot_longer(2:length(.)) %>%
@@ -131,11 +134,12 @@ p_relimp_herb_noint <- herb_noint_relimp %>%
   aes(x = species, y = rel_imp) +
   stat_summary(geom = "bar", fun = mean, position = "dodge",  fill = guild_colours$herb) +
   facet_wrap(~facet.title, nrow = 1) +
-  labs(subtitle = "Herbivores", y = "Relative Importance (prop.)") +
+  labs(subtitle = "(C) Herbivores", y = "Relative Importance (prop.)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "italic"), strip.placement = "outside",
         axis.title.x = element_blank(), 
         strip.text.x = element_text(size = 12, face = "bold"),
-        plot.margin = margin(.2,1,.2,1, "cm"))
+        plot.margin = margin(.2,1,.2,1, "cm"),
+        plot.title = element_text(size = 16))
 
 patch_plot_noint <- p_relimp_grps_noint / p_relimp_dip_noint / p_relimp_herb_noint
 # Remove y axis titles from first and third subplots and enlarge the middle one's
@@ -144,7 +148,7 @@ patch_plot_noint[[2]] <- patch_plot_noint[[2]] + theme(axis.title.y = element_te
 patch_plot_noint[[3]] <- patch_plot_noint[[3]] + theme(axis.title.y = element_blank())
 
 patch_plot_noint
-# ggsave(patch_plot_noint, filename = "rel_imp_noint.png", device = "png", path = "figures/appendix", 
+# ggsave(patch_plot_noint, filename = "rel_imp_noint.png", device = "png", path = "figures/appendix",
 #        dpi = 150, height = 10, width = 10, units = "in")
 # ggsave(patch_plot_noint, filename = "rel_imp_noint.pdf", device = "pdf", path = "figures/appendix",
 #        dpi = 150, height = 10, width = 10, units = "in")
