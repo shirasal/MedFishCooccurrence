@@ -33,6 +33,7 @@ species_mats <- list(grps_mat, dip_mat, herb_mat)
 names(species_mats) <- c("grps", "dip", "herb")
 
 coord_dfs <- list(grps_coords, dip_coords, herb_coords)
+names(coord_dfs) <- c("grps", "dip", "herb")
 
 ############################################### SPATIAL MODELS ###############################################
 
