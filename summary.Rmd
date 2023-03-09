@@ -13,6 +13,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
+library(formattable)
 ```
 
 Methods
@@ -35,9 +36,9 @@ Column
 - Data from all around the Mediterranean: [MEData](https://belmaker-lab.github.io/medata/)
 - Three focal groups of species, each containing four species:
 
-  1. Groupers ( _Epinephelus_ and _Serranus_ species)
-  2. Seabreams ( _Diplodus_ species) 
-  3. Herbivores (including invasive rabbitfish, data from East Med only)
+1. Groupers ( _Epinephelus_ and _Serranus_ species)
+2. Seabreams ( _Diplodus_ species) 
+3. Herbivores (including invasive rabbitfish, data from East Med only)
 
 - Environmental covariates include: temperature (SST), primary productivity, depth and MPA protection.
 
@@ -53,11 +54,11 @@ Column
 - Co-occurrence patterns examined with the [`MRFcov` package](https://github.com/nicholasjclark/MRFcov).
 - We extract the **R**elative **I**mportance (**RI**) of each of the following:
 
-  1. All environmental covariates except MPA
-  2. MPA protection
-  3. Biotic associations
-  4. The interaction between temperature and biotic associations
-  5. The interaction between MPA protection and biotic associations
+1. All environmental covariates except MPA
+2. MPA protection
+3. Biotic associations
+4. The interaction between temperature and biotic associations
+5. The interaction between MPA protection and biotic associations
 
 ### Steps
 
@@ -73,11 +74,36 @@ The results I show here are after the following treatment:
 Biomass Model Results
 =======================================================================
 
+The results here are from spatial models on based on scaled, log-transformed fish biomass. In these models, spatial autocorrelation is accounted for via [Gaussian Process spatial regression splines](https://www.rdocumentation.org/packages/MRFcov/versions/1.0.38/topics/MRFcov_spatial).  
+
+
 Row {data-height=2000 .tabset}
 -----------------------------------------------------------------------
 
 ```{r include=FALSE}
-source(here::here("R/2 models.R"))
+source(here::here("R/2 biomass_spatial_models.R"))
+
+```
+
+<!-- Create a relimp table to show the results in detail -->
+```{r include=FALSE}
+relimp_table <- spat_relimp$grps %>% mutate(guild = names(guilds[1])) %>% 
+  bind_rows(spat_relimp$dip %>% mutate(guild = names(guilds[2]))) %>% 
+  bind_rows(spat_relimp$herb %>% mutate(guild = names(guilds[3]))) %>% 
+  relocate(guild, .after = species) %>% 
+  pivot_longer(3:length(.)) %>%
+  rename(covariate = name, rel_imp = value) %>%
+  mutate(focal_species = str_replace_all(species, "\\.", "\\ "),
+         covariate = str_replace_all(covariate, "_", "\\ x "),
+         covariate = str_replace_all(covariate, "temp", "Temperature"),
+         covariate = str_replace_all(covariate, "env", "Environment"),
+         covariate = str_replace_all(covariate, "bio", "Biotic Associations"),
+         covariate = str_replace_all(covariate, "mpa", "MPA")) %>% 
+  # The NAs in 'covariate' are for the species associations interaction with environmental variables that are not temperature
+  filter(!is.na(covariate), covariate != "NA") %>% 
+  pivot_wider(id_cols = c(focal_species, guild), names_from = covariate, values_from = rel_imp, values_fill = 0) %>% 
+  replace(is.na(.), 0)
+
 
 ```
 
@@ -86,7 +112,7 @@ source(here::here("R/2 models.R"))
 #### 
 
 ```{r, fig.width=10}
-mass_relimp$grps_mass_relimp %>% 
+spat_relimp$grps %>% 
   plot_relimp(guild_col = "grps", guild_name = "Groupers")
 
 ```
@@ -102,20 +128,11 @@ mass_relimp$grps_mass_relimp %>%
 ####
 
 ```{r}
-lapply(names(biomass_models$grps_mass$key_coefs), function(x)
-  biomass_models$grps_mass$key_coefs[[x]] %>% 
-    mutate(focal_species = x)) %>% 
-  bind_rows %>% 
-  mutate(focal_species = str_replace_all(focal_species, "\\.", "\\ "),
-         Variable = str_replace_all(Variable, "\\.", "\\ "),
-         Variable = str_replace_all(Variable, "_", "\\ x "),
-         Variable = str_replace_all(Variable, "temp", "Temperature"),
-         Variable = str_replace_all(Variable, "depth", "Depth"),
-         Variable = str_replace_all(Variable, "prod", "Productivity"),
-         Variable = str_replace_all(Variable, "mpa", "MPA")) %>%
-  select("Focal species" = focal_species, Variable, RI = Rel_importance, 
-         "Key coefficient" = Standardised_coef) %>% 
-  formattable::formattable(align = c("l", "l", "l", "l"))
+
+relimp_table %>% filter(guild == names(guilds[1])) %>% 
+  select("Focal Species" = focal_species, Environment, MPA, "Biotic Associations", 
+         "Temperature x Biotic Associations", "MPA x Biotic Associations") %>% 
+  formattable(align = c("l", "l", "l", "l", "l", "l"))
 
 ```
 
@@ -124,7 +141,7 @@ lapply(names(biomass_models$grps_mass$key_coefs), function(x)
 ####
 
 ```{r, fig.width=10}
-mass_relimp$dip_mass_relimp %>% select(-`NA`) %>% 
+spat_relimp$dip %>% select(-`NA`) %>% 
   plot_relimp(guild_col = "dip", guild_name = "Seabreams")
 
 ```
@@ -139,20 +156,11 @@ mass_relimp$dip_mass_relimp %>% select(-`NA`) %>%
 ####
 
 ```{r}
-lapply(names(biomass_models$dip_mass$key_coefs), function(x)
-  biomass_models$dip_mass$key_coefs[[x]] %>% 
-    mutate(focal_species = x)) %>% 
-  bind_rows %>% 
-  mutate(focal_species = str_replace_all(focal_species, "\\.", "\\ "),
-         Variable = str_replace_all(Variable, "\\.", "\\ "),
-         Variable = str_replace_all(Variable, "_", "\\ x "),
-         Variable = str_replace_all(Variable, "temp", "Temperature"),
-         Variable = str_replace_all(Variable, "depth", "Depth"),
-         Variable = str_replace_all(Variable, "prod", "Productivity"),
-         Variable = str_replace_all(Variable, "mpa", "MPA")) %>%
-  select("Focal species" = focal_species, Variable, RI = Rel_importance, 
-         "Key coefficient" = Standardised_coef) %>% 
-  formattable::formattable(align = c("l", "l", "l", "l"))
+
+relimp_table %>% filter(guild == names(guilds[2])) %>% 
+  select("Focal Species" = focal_species, Environment, MPA, "Biotic Associations", 
+         "Temperature x Biotic Associations", "MPA x Biotic Associations") %>% 
+  formattable(align = c("l", "l", "l", "l", "l", "l"))
 
 ```
 
@@ -161,7 +169,7 @@ lapply(names(biomass_models$dip_mass$key_coefs), function(x)
 ####
 
 ```{r, fig.width=10}
-mass_relimp$herb_mass_relimp %>% select(-`NA`) %>% 
+spat_relimp$herb %>% select(-`NA`) %>% 
   plot_relimp(guild_col = "herb", guild_name = "Herbivores")
 
 ```
@@ -177,20 +185,10 @@ mass_relimp$herb_mass_relimp %>% select(-`NA`) %>%
 ####
 
 ```{r}
-lapply(names(biomass_models$herb_mass$key_coefs), function(x)
-  biomass_models$herb_mass$key_coefs[[x]] %>% 
-    mutate(focal_species = x)) %>% 
-  bind_rows %>% 
-  mutate(focal_species = str_replace_all(focal_species, "\\.", "\\ "),
-         Variable = str_replace_all(Variable, "\\.", "\\ "),
-         Variable = str_replace_all(Variable, "_", "\\ x "),
-         Variable = str_replace_all(Variable, "temp", "Temperature"),
-         Variable = str_replace_all(Variable, "depth", "Depth"),
-         Variable = str_replace_all(Variable, "prod", "Productivity"),
-         Variable = str_replace_all(Variable, "mpa", "MPA")) %>%
-  select("Focal species" = focal_species, Variable, RI = Rel_importance, 
-         "Key coefficient" = Standardised_coef) %>% 
-  formattable::formattable(align = c("l", "l", "l", "l"))
+relimp_table %>% filter(guild == names(guilds[3])) %>% 
+  select("Focal Species" = focal_species, Environment, MPA, "Biotic Associations", 
+         "Temperature x Biotic Associations", "MPA x Biotic Associations") %>% 
+  formattable(align = c("l", "l", "l", "l", "l", "l"))
 
 ```
 
@@ -199,9 +197,12 @@ Row
 
 ### Stationarity vs. Nonstationarity
 
+This part is brought just to get an idea of how much the results point out towards non-stationarity (non-stationary == **FALSE** means stationary).  
+
+
 ```{r echo=TRUE, message=FALSE, warning=FALSE, tidy=TRUE}
 
-lapply(all_relimp_mass, function(x){
+lapply(all_relimp_spat, function(x){
   cov_titles <- tibble(covariate = c("env", "mpa", "bio", "temp_bio", "mpa_bio"),
                        facet.title = factor(c("Environment", "MPA", "Biotic Associations",
                                               "Temp * Biotic", "MPA * Biotic"),
@@ -222,9 +223,11 @@ lapply(all_relimp_mass, function(x){
     summarise(mean_RI = mean(sum))
 })
 
+
 ```
 
-Overall, groupers and seabreams (Diplodus species) are more affected by stationary factors, while non-stationary factors are affecting herbivorous species distribution to a greater extent.
+Overall, we can assume stationarity.  
+
 
 Main-Effect Model Results
 =======================================================================
@@ -280,8 +283,7 @@ dip_noint_relimp %>%
 ####
 
 ```{r, fig.width=10}
-mass_relimp$herb_mass_relimp %>% select(-`NA`) %>% 
-  plot_relimp(guild_col = "herb", guild_name = "Herbivores")
+p_relimp_herb_noint
 
 ```
 
@@ -295,47 +297,75 @@ herb_noint_relimp %>%
 
 ```
 
-Abundance Models Results
-=======================================================================
-
-```{r include=FALSE}
-source(here::here("R/models_abund.R"))
-
-```
-
-### 
-
-```{r, , fig.height=10}
-patch_plot
-
-```
 
 Networks
 =======================================================================
 
 The width of the links between species was adjusted with an exponent function to emphasize small differences in association strength.
 
-Temperature
+Groupers {.tabset}
 -----------------------------------------------------------------------
 
-### Groupers
+### Groupers | Temperature
+
+Three networks show the species associations in minimum, median and maximum temperature.
 
 ```{r, fig.dim=c(12,3.7)}
-plotMRF_net_cont(species_mats_mass$grps_mass_mat, biomass_models$grps_mass, node_names = guilds$groupers, covariate = "temp")
+plotMRF_net(data = species_mats$grps, MRF_mod = spatial_models$grps_spat, node_names = guilds$groupers,
+            covariate = all_covs[1], cutoff = 0.03, type = "cont")
+```
+
+### Groupers | MPA
+
+Two networks show species associations outside (left) and inside (right) MPAs.
+
+```{r, fig.dim=c(5,6)}
+plotMRF_net(data = species_mats$grps, MRF_mod = spatial_models$grps_spat, node_names = guilds$groupers,
+            covariate = all_covs[4], cutoff = 0.03, type = "factor")
 
 ```
 
-### Seabreams
+Seabreams {.tabset}
+-----------------------------------------------------------------------
+
+### Seabreams | Temperature
+
+Three networks show the species associations in minimum, median and maximum temperature.
 
 ```{r, fig.dim=c(12,3.7)}
-plotMRF_net_cont(species_mats_mass$dip_mass_mat, biomass_models$dip_mass, node_names = guilds$diplodus, covariate = "temp")
+plotMRF_net(data = species_mats$dip, MRF_mod = spatial_models$dip_spat, node_names = guilds$diplodus,
+            covariate = all_covs[1], cutoff = 0.03, type = "cont")
+```
+
+### Seabreams | MPA
+
+Two networks show species associations outside (left) and inside (right) MPAs.
+
+```{r, fig.dim=c(5,6)}
+plotMRF_net(data = species_mats$dip, MRF_mod = spatial_models$dip_spat, node_names = guilds$diplodus, 
+            covariate = all_covs[4], cutoff = 0.03, type = "factor")
 
 ```
 
-### Herbivores
-```{r, fig.dim=c(12,3.7)}
-plotMRF_net_cont(species_mats_mass$herb_mass_mat, biomass_models$herb_mass, node_names = guilds$herbivores, covariate = "temp")
+Herbivores {.tabset}
+-----------------------------------------------------------------------
 
+### Herbivores | Temperature
+
+Three networks show the species associations in minimum, median and maximum temperature.
+
+```{r, fig.dim=c(12,3.7)}
+plotMRF_net(data = species_mats$grps, MRF_mod = spatial_models$grps_spat, node_names = guilds$groupers,
+            covariate = all_covs[1], cutoff = 0.03, type = "cont")
 ```
 
+### Herbivores | MPA
+
+Two networks show species associations outside (left) and inside (right) MPAs.
+
+```{r, fig.dim=c(5,6)}
+plotMRF_net(data = species_mats$grps, MRF_mod = spatial_models$grps_spat, node_names = guilds$groupers,
+            covariate = all_covs[4], cutoff = 0.03, type = "factor")
+
+```
 
