@@ -1,7 +1,7 @@
-# Run models.R first
+source("R/2 biomass_spatial_models.R")
 
-lapply(names(biomass_models$grps_mass$key_coefs), function(x)
-  biomass_models$grps_mass$key_coefs[[x]] %>% 
+lapply(names(spatial_models$grps_spat$key_coefs), function(x)
+  spatial_models$grps_spat$key_coefs[[x]] %>% 
     mutate(focal_species = x)) %>% 
   bind_rows %>% 
   mutate(focal_species = str_replace_all(focal_species, "\\.", "\\ "),
@@ -15,8 +15,8 @@ lapply(names(biomass_models$grps_mass$key_coefs), function(x)
          "Key coefficient" = Standardised_coef) %>% 
   formattable::formattable(align = c("l", "l", "l", "l"))
 
-lapply(names(biomass_models$dip_mass$key_coefs), function(x)
-  biomass_models$dip_mass$key_coefs[[x]] %>% 
+lapply(names(spatial_models$dip_spat$key_coefs), function(x)
+  spatial_models$dip_spat$key_coefs[[x]] %>% 
     mutate(focal_species = x)) %>% 
   bind_rows %>% 
   mutate(focal_species = str_replace_all(focal_species, "\\.", "\\ "),
@@ -30,8 +30,8 @@ lapply(names(biomass_models$dip_mass$key_coefs), function(x)
          "Key coefficient" = Standardised_coef) %>% 
   formattable::formattable(align = c("l", "l", "l", "l"))
 
-lapply(names(biomass_models$herb_mass$key_coefs), function(x)
-  biomass_models$herb_mass$key_coefs[[x]] %>% 
+lapply(names(spatial_models$herb_spat$key_coefs), function(x)
+  spatial_models$herb_spat$key_coefs[[x]] %>% 
     mutate(focal_species = x)) %>% 
   bind_rows %>% 
   mutate(focal_species = str_replace_all(focal_species, "\\.", "\\ "),
@@ -48,8 +48,8 @@ lapply(names(biomass_models$herb_mass$key_coefs), function(x)
 
 # Save --------------------------------------------------------------------
 
-lapply(names(biomass_models$grps_mass$key_coefs), function(x)
-  biomass_models$grps_mass$key_coefs[[x]] %>% 
+lapply(names(spatial_models$grps_spat$key_coefs), function(x)
+  spatial_models$grps_spat$key_coefs[[x]] %>% 
     mutate(focal_species = x)) %>% 
   bind_rows %>% 
   mutate(focal_species = str_replace_all(focal_species, "\\.", "\\ "),
@@ -63,8 +63,8 @@ lapply(names(biomass_models$grps_mass$key_coefs), function(x)
          "Key coefficient" = Standardised_coef) %>% 
   write_csv("data/results/grps_coefs.csv")
 
-lapply(names(biomass_models$dip_mass$key_coefs), function(x)
-  biomass_models$dip_mass$key_coefs[[x]] %>% 
+lapply(names(spatial_models$dip_spat$key_coefs), function(x)
+  spatial_models$dip_spat$key_coefs[[x]] %>% 
     mutate(focal_species = x)) %>% 
   bind_rows %>% 
   mutate(focal_species = str_replace_all(focal_species, "\\.", "\\ "),
@@ -78,8 +78,8 @@ lapply(names(biomass_models$dip_mass$key_coefs), function(x)
          "Key coefficient" = Standardised_coef) %>% 
   write_csv("data/results/dip_coefs.csv")
 
-lapply(names(biomass_models$herb_mass$key_coefs), function(x)
-  biomass_models$herb_mass$key_coefs[[x]] %>% 
+lapply(names(spatial_models$herb_spat$key_coefs), function(x)
+  spatial_models$herb_spat$key_coefs[[x]] %>% 
     mutate(focal_species = x)) %>% 
   bind_rows %>% 
   mutate(focal_species = str_replace_all(focal_species, "\\.", "\\ "),
