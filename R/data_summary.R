@@ -11,28 +11,11 @@ data_sum <- my_data %>%
   select(site, lon, lat, unique_trans_id, mpa, temp, depth, prod) %>% 
   distinct()
 
+# Sites metadata and number of transects
 data_sum %>% 
-  count(site, mpa, temp, depth) %>% 
-  gt() %>% 
-  tab_header(
-    title = "Sites summary",
-    subtitle = "Only transects with at least one the focal species of either group (groupers, seabreams or herbivores) are included."
-  ) %>% 
-  fmt_number(
-    columns = c(temp, depth), 
-    ) %>% 
-  fmt_integer(
-    columns = n
-  ) %>% 
-  cols_align(align = "left") %>% 
-  cols_label(site = md("**Site**"), 
-             mpa = md("**MPA**"), 
-             temp = md("**Temperature (SST)**"), 
-             depth = md("**Depth**"), 
-             n = md("**n Transects**")) %>% 
-  opt_align_table_header(align = "center") %>% gtsave(filename = "sites_table.rtf", path = "data/processed/")
-
-# data_sum %>% 
-#   count(site, mpa, temp, depth) %>% 
-#   write_csv("data/processed/sites_table.csv")
-
+  group_by(site, mpa) %>% 
+  summarise(temp_range = str_glue("{round(min(temp), 2)} - {round(max(temp), 2)}"),
+            depth_range = str_glue("{round(min(depth), 1)} - {round(max(depth), 1)}"),
+            prod_range = str_glue("{round(min(prod), 4)} - {round(max(prod), 4)}"),
+            n_transects = n_distinct(unique_trans_id)) %>% 
+  write.table("data/processed/sites_table.txt", sep = ",", quote = FALSE, row.names = FALSE)
