@@ -1,7 +1,5 @@
-
-source("R/2 biomass_spatial_models.R", echo = TRUE)
-
-n_nodes = 4
+## Run if not done yet!!!
+# source("R/2 biomass_spatial_models.R", echo = TRUE)
 
 # Groupers ----------------------------------------------------------------
 
@@ -10,7 +8,7 @@ grps_dat <- species_mats$grps
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
 # Cross-multiply the data with covariates manually
-grps_prepped_dat <- prep_MRF_covariates(grps_dat, n_nodes = n_nodes)
+grps_prepped_dat <- prep_MRF_covariates(grps_dat, n_nodes = 4)
 
 # Find the covariate * species interaction columns in the prepped data and set to zero
 # cov_names_remove <- paste(colnames(dat[,-c(1:n_nodes)]), '_', colnames(dat[,c(1:n_nodes)]), sep = '')
@@ -19,7 +17,8 @@ grps_prepped_dat <- grps_prepped_dat %>%
   mutate(across(.cols = 9:ncol(grps_prepped_dat), .fns = function(x) 0))
 
 # Re-fit the model, setting prep_covariates to FALSE
-grps_no_int <- MRFcov(grps_prepped_dat, n_nodes = 4, prep_covariates = F, family = 'gaussian')
+grps_no_int <- MRFcov_spatial(grps_prepped_dat, coords = coord_dfs$grps, 
+                              n_nodes = 4, prep_covariates = F, family = "gaussian")
 grps_no_int$graph
 grps_no_int$direct_coefs
 
@@ -34,7 +33,7 @@ dip_dat <- species_mats$dip
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
 # Cross-multiply the data with covariates manually
-dip_prepped_dat <- prep_MRF_covariates(dip_dat, n_nodes = n_nodes)
+dip_prepped_dat <- prep_MRF_covariates(dip_dat, n_nodes = 4)
 
 # Find the covariate * species interaction columns in the prepped data and set to zero
 # cov_names_remove <- paste(colnames(dat[,-c(1:n_nodes)]), '_', colnames(dat[,c(1:n_nodes)]), sep = '')
@@ -43,7 +42,8 @@ dip_prepped_dat <- dip_prepped_dat %>%
   mutate(across(.cols = 9:ncol(dip_prepped_dat), .fns = function(x) 0))
 
 # Re-fit the model, setting prep_covariates to FALSE
-dip_no_int <- MRFcov(dip_prepped_dat, n_nodes = 4, prep_covariates = F, family = 'gaussian')
+dip_no_int <- MRFcov_spatial(dip_prepped_dat, coords = coord_dfs$dip, 
+                             n_nodes = 4, prep_covariates = F, family = "gaussian")
 dip_no_int$graph
 dip_no_int$direct_coefs
 
@@ -58,7 +58,7 @@ herb_dat <- species_mats$herb
 # To fit without interactions, the simplest way given the package constraints is to set these
 # columns to zero so they will be regularised out of the model
 # Cross-multiply the data with covariates manually
-herb_prepped_dat <- prep_MRF_covariates(herb_dat, n_nodes = n_nodes)
+herb_prepped_dat <- prep_MRF_covariates(herb_dat, n_nodes = 4)
 
 # Find the covariate * species interaction columns in the prepped data and set to zero
 # cov_names_remove <- paste(colnames(dat[,-c(1:n_nodes)]), '_', colnames(dat[,c(1:n_nodes)]), sep = '')
@@ -67,7 +67,8 @@ herb_prepped_dat <- herb_prepped_dat %>%
   mutate(across(.cols = 9:ncol(herb_prepped_dat), .fns = function(x) 0))
 
 # Re-fit the model, setting prep_covariates to FALSE
-herb_no_int <- MRFcov(herb_prepped_dat, n_nodes = 4, prep_covariates = F, family = 'gaussian')
+herb_no_int <- MRFcov_spatial(dip_prepped_dat, coords = coord_dfs$dip, 
+                              n_nodes = 4, prep_covariates = F, family = "gaussian")
 herb_no_int$graph
 herb_no_int$direct_coefs
 
