@@ -50,11 +50,45 @@ plot_relimp <- function(rel_imp_df, guild_col, guild_name){
 
 # Plot networks -----------------------------------------------------------
 
+# Create network graph - this function is used in the following function `plotMRF_net`
+create_netgraph = function(matrix, node_names, cutoff, predictor_value){
+  
+  # Create the adjacency network graph
+  comm.net <- igraph::graph.adjacency(matrix, weighted = T, mode = "undirected")
+  
+  # Specify edge colours
+  cols <- c(neg = "#FF3333", pos = "#3399CC")
+  igraph::E(comm.net)$color <- ifelse(igraph::E(comm.net)$weight < 0,
+                                      cols[["neg"]],
+                                      cols[["pos"]])
+  # Remove edges (links) under cutoff value
+  comm.net <- igraph::delete.edges(comm.net, which(abs(igraph::E(comm.net)$weight) <= cutoff))
+  # Set edge width according to association coefficients
+  igraph::E(comm.net)$width <- abs(igraph::E(comm.net)$weight) * 1.75
+  # Set vertex label to the shortened species name
+  igraph::V(comm.net)$label <- str_replace(node_names, ".*\\.", paste0(substr(node_names, start = 1, stop = 1), ". "))
+  
+  # Create the network plot
+  graphics::par(mar = c(0, 2, 0, 2))
+  net.plot <- plot(comm.net,
+                   layout = igraph::layout.circle,
+                   vertex.label.cex = 1.6,
+                   vertex.shape = "none",
+                   vertex.label.family = "sans",
+                   vertex.label.font = 3,
+                   vertex.label.color = "black",
+                   edge.label = round(igraph::E(comm.net)$weight, 2),
+                   edge.label.cex = 1.5,
+                   edge.label.family = "sans",
+                   edge.label.color = "darkgray")
+  return(net.plot)
+}
+
 # For type="all" the covariate doesn't matter, can by any
-# type options: "all" = mean network; "cont" = continuous gradient (such as temp); "factor" = like MPA
+# 'type' options: "all" = mean network; "cont" = continuous gradient (such as temp); "factor" = like MPA
 plotMRF_net <- function(data, MRF_mod, node_names, covariate,
                         main, cutoff, plot, type){
-
+  
   if(MRF_mod$mod_type == "MRFcov"){
     plot_booted_coefs <- FALSE
   } else {
@@ -69,18 +103,18 @@ plotMRF_net <- function(data, MRF_mod, node_names, covariate,
     cutoff <- 0
   }
   
+  # If plot_booted_coefs = FALSE, extract graph
   if(!plot_booted_coefs){
-    #### Extract model coefficients ####
+    ## Extract model coefficients
     interaction_coefficients <- MRF_mod$graph
     
-    #### Specify default parameter settings ####
+    ## Specify default parameter settings
     if(missing(node_names)){
       node_names <- colnames(interaction_coefficients)
     }
-    dimnames(interaction_coefficients) <- list(node_names,
-                                               node_names)
+    dimnames(interaction_coefficients) <- list(node_names, node_names)
     
-    #### Extract indirect effect matrix that matches the covariate name ####
+    ## Extract indirect effect matrix that matches the covariate name
     indirect_coef_names <- names(MRF_mod$indirect_coefs)
     which_matrix_keep <- grepl(covariate, indirect_coef_names)
     covariate_matrix <- MRF_mod$indirect_coefs[which_matrix_keep]
@@ -89,20 +123,20 @@ plotMRF_net <- function(data, MRF_mod, node_names, covariate,
     
   } else {
     
-    #### If plot_booted_coefs = TRUE, extract and plot mean coefficients ####
-    #### Extract model coefficients ####
+    # If plot_booted_coefs = TRUE, extract and plot mean coefficients
+    ## Extract model coefficients
     coef_matrix <- MRF_mod$direct_coef_means
     interaction_coefficients <- coef_matrix[, 2:(nrow(coef_matrix) + 1)]  +
       (Reduce(`+`, MRF_mod$indirect_coef_mean) /
          length(MRF_mod$indirect_coef_mean))
     
-    #### Specify default parameter settings ####
+    ## Specify default parameter settings
     if(missing(node_names)){
       node_names <- rownames(coef_matrix)
     }
     dimnames(interaction_coefficients) <- list(node_names, node_names)
     
-    #### Extract indirect effect matrix that matches the covariate name ####
+    ## Extract indirect effect matrix that matches the covariate name
     indirect_coef_names <- names(MRF_mod$indirect_coef_mean)
     which_matrix_keep <- grepl(covariate, indirect_coef_names)
     covariate_matrix <- MRF_mod$indirect_coef_mean[which_matrix_keep][[1]]
@@ -112,14 +146,15 @@ plotMRF_net <- function(data, MRF_mod, node_names, covariate,
     
   }
   
+  # Plot networks along a continuous gradient (like temperature)
   if (type == "cont") {
-    #### Extract quantiles of observed values for the covariate ####
+    ## Extract quantiles of observed values for the covariate to create gradient
     observed_cov_values <- as.vector(data[[paste(covariate)]])
     observed_cov_quantiles <- quantile(observed_cov_values,
                                        probs = c(0, 0.5, 1), na.rm = T)
     
-    #If number of unique values is low, quantiles may be identical. Instead,
-    #generate a sequence of 10 simulated values from the observed min to the observed max
+    ## If number of unique values is low, quantiles may be identical. Instead,
+    ## generate a sequence of 10 simulated values from the observed min to the observed max
     if(length(unique(observed_cov_quantiles)) < 3){
       observed_cov_quantiles <- quantile(seq(min(observed_cov_values),
                                              max(observed_cov_values),
@@ -127,7 +162,7 @@ plotMRF_net <- function(data, MRF_mod, node_names, covariate,
                                          probs = c(0, 0.5, 1), na.rm = T)
     }
     
-    #### Create a gridded plot object to plot the three networks
+    ## Create a gridded plot object to plot the three networks
     graphics::par(mfrow = c(1, length(observed_cov_quantiles)))
     cont.cov.mats <- lapply(observed_cov_quantiles, function(j){
       pred_values <- (covariate_matrix * j) + baseinteraction_matrix
@@ -139,17 +174,18 @@ plotMRF_net <- function(data, MRF_mod, node_names, covariate,
     
   }
   
+  # Plot networks for each factor value (like MPA: TRUE and FALSE)
   if (type == "factor") {
-    #### Extract quantiles of observed values for the covariate ####
+    ## Extract unique values of the factor covariate
     observed_cov_values <- as.vector(data[[paste(covariate)]])
     observed_cov_unique <- as.numeric(unique(observed_cov_values, na.rm = T))
     
-    #If number of unique values is low, quantiles may be identical, throw warning:
+    ## If number of unique values is low, quantiles may be identical, throw warning:
     if(length(unique(observed_cov_values)) < 2){
       warning("Less than 2 quantiles, network may be identical") 
     }
     
-    #### Create a gridded plot object to plot the three networks
+    ## Create a gridded plot object to plot the unique networks
     graphics::par(mfrow = c(1, length(observed_cov_unique)))
     cont.cov.mats <- lapply(observed_cov_unique, function(j){
       pred_values <- (covariate_matrix * j) + baseinteraction_matrix
@@ -158,6 +194,7 @@ plotMRF_net <- function(data, MRF_mod, node_names, covariate,
     })
   }
   
+  # Plot a single network, based on mean species association coefficients (regardless of covariates)
   if (type == "all") {
     graphics::par(mfrow = c(1,1))
     pred_values <-  0 * covariate_matrix + baseinteraction_matrix
@@ -171,8 +208,8 @@ plotMRF_net <- function(data, MRF_mod, node_names, covariate,
 # Improved MRFcov cv.pred for Poisson Deviance ----------------------------
 
 my_cv_MRF_diag <- function (data, symmetrise, n_nodes, n_cores, sample_seed, n_folds, 
-          n_fold_runs, n_covariates, compare_null, family, plot = TRUE, 
-          cached_model, cached_predictions, mod_labels = NULL) 
+                            n_fold_runs, n_covariates, compare_null, family, plot = TRUE, 
+                            cached_model, cached_predictions, mod_labels = NULL) 
 {
   if (!(family %in% c("gaussian", "poisson", "binomial"))) 
     stop("Please select one of the three family options:\n         \"gaussian\", \"poisson\", \"binomial\"")
@@ -684,9 +721,9 @@ my_cv_MRF_diag_rep <- function (data, symmetrise, n_nodes, n_cores, sample_seed,
     cat("Processing cross-validation run ", x, " of ", n_fold_runs, 
         " ...\n", sep = "")
     my_cv_MRF_diag(data = data, n_nodes = n_nodes, n_folds = n_folds, 
-                n_cores = n_cores, family = family, compare_null = compare_null, 
-                plot = FALSE, cached_model = cached_model, cached_predictions = cached_predictions, 
-                sample_seed = sample_seed)
+                   n_cores = n_cores, family = family, compare_null = compare_null, 
+                   plot = FALSE, cached_model = cached_model, cached_predictions = cached_predictions, 
+                   sample_seed = sample_seed)
   })
   plot_dat <- do.call(rbind, repped_cvs)
   if (plot) {
