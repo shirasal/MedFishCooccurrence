@@ -53,14 +53,15 @@ spat_relimp$grps
 spat_relimp$dip
 spat_relimp$herb
 
+# R-squared values from 'R/model_eval.R'
 p_relimp_grps_spat <- spat_relimp$grps %>% 
-  plot_relimp(guild_col = "grps", guild_name = "(A) Groupers")
+  plot_relimp(guild_col = "grps", guild_name = expression(paste("(A) Groupers (R"^2," = 0.378)")))
 
 p_relimp_dip_spat <- spat_relimp$dip %>% select(-`NA`) %>% 
-  plot_relimp(guild_col = "dip", guild_name = "(B) Seabreams")
+  plot_relimp(guild_col = "dip", guild_name = expression(paste("(B) Seabreams (R"^2," = 0.36)")))
 
 p_relimp_herb_spat <- spat_relimp$herb %>% select(-`NA`) %>% 
-  plot_relimp(guild_col = "herb", guild_name = "(C) Herbivores")
+  plot_relimp(guild_col = "herb", guild_name = expression(paste("(C) Herbivores (R"^2," = 0.562)")))
 
 # ggsave(plot = p_relimp_grps_spat, filename = "figures/relimp_grps_spat.png", device = "png",
 #        dpi = 300, width = 11.74, height = 4, units = "in")

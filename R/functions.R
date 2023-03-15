@@ -205,14 +205,19 @@ plotMRF_net <- function(data, MRF_mod, node_names, covariate,
 }
 
 
-# Improved MRFcov cv.pred for Poisson Deviance ----------------------------
 
-my_cv_MRF_diag <- function (data, symmetrise, n_nodes, n_cores, sample_seed, n_folds, 
-                            n_fold_runs, n_covariates, compare_null, family, plot = TRUE, 
-                            cached_model, cached_predictions, mod_labels = NULL) 
+# CV function -------------------------------------------------------------
+
+# To over
+
+cv_MRF_diag_spatial <- function (data, coords, symmetrise, n_nodes, n_cores, sample_seed, n_folds, 
+                                 n_fold_runs, n_covariates, compare_null, family, plot = TRUE, 
+                                 cached_model, cached_predictions, mod_labels = NULL) 
 {
   if (!(family %in% c("gaussian", "poisson", "binomial"))) 
     stop("Please select one of the three family options:\n         \"gaussian\", \"poisson\", \"binomial\"")
+  if (missing(coords))
+    stop("Please set of coordinates")
   if (missing(symmetrise)) {
     symmetrise <- "mean"
   }
@@ -290,35 +295,35 @@ my_cv_MRF_diag <- function (data, symmetrise, n_nodes, n_cores, sample_seed, n_f
     cat("Generating node-optimised Conditional Random Fields model", 
         "\n", sep = "")
     if (family == "binomial") {
-      mrf <- MRFcov(data = data, symmetrise = symmetrise, 
+      mrf <- MRFcov_spatial(data = data, coords = coords, symmetrise = symmetrise, 
                     n_nodes = n_nodes, n_cores = n_cores, family = "binomial")
       if (compare_null) {
         cat("\nGenerating Markov Random Fields model (no covariates)", 
             "\n", sep = "")
-        mrf_null <- MRFcov(data = data[, 1:n_nodes], 
+        mrf_null <- MRFcov_spatial(data = data[, 1:n_nodes], coords = coords, 
                            symmetrise = symmetrise, n_nodes = n_nodes, 
                            n_cores = n_cores, family = "binomial")
       }
     }
     if (family == "poisson") {
-      mrf <- MRFcov(data = data, symmetrise = symmetrise, 
+      mrf <- MRFcov_spatial(data = data, coords = coords, symmetrise = symmetrise, 
                     n_nodes = n_nodes, n_cores = n_cores, family = "poisson")
       if (compare_null) {
         cat("\nGenerating Markov Random Fields model (no covariates)", 
             "\n", sep = "")
-        mrf_null <- MRFcov(data = data[, 1:n_nodes], 
-                           symmetrise = symmetrise, n_nodes = n_nodes, 
+        mrf_null <- MRFcov_spatial(data = data[, 1:n_nodes], coords = coords, 
+                                   symmetrise = symmetrise, n_nodes = n_nodes, 
                            n_cores = n_cores, family = "poisson")
       }
     }
     if (family == "gaussian") {
-      mrf <- MRFcov(data = data, symmetrise = symmetrise, 
+      mrf <- MRFcov_spatial(data = data, coords = coords, symmetrise = symmetrise, 
                     n_nodes = n_nodes, n_cores = n_cores, family = "gaussian")
       if (compare_null) {
         cat("\nGenerating Markov Random Fields model (no covariates)", 
             "\n", sep = "")
-        mrf_null <- MRFcov(data = data[, 1:n_nodes], 
-                           symmetrise = symmetrise, n_nodes = n_nodes, 
+        mrf_null <- MRFcov_spatial(data = data[, 1:n_nodes], coords = coords, 
+                                   symmetrise = symmetrise, n_nodes = n_nodes, 
                            n_cores = n_cores, family = "gaussian")
       }
     }
@@ -441,10 +446,10 @@ my_cv_MRF_diag <- function (data, symmetrise, n_nodes, n_cores, sample_seed, n_f
       Rsquared <- vector()
       MSE <- vector()
       for (i in seq_len(ncol(predictions))) {
-        Rsquared[i] <- cor.test(test_data[, i], predictions[, 
-                                                            i])[[4]]
-        MSE[i] <- mean((test_data[, i] - predictions[, 
-                                                     i])^2)
+        Rsquared[i] <- cor.test(unlist(test_data[, i]), predictions[, 
+                                                                    i])[[4]]
+        MSE[i] <- mean((unlist(test_data[, i]) - predictions[, 
+                                                             i])^2)
       }
       list(Rsquared = mean(Rsquared, na.rm = T), MSE = mean(MSE, 
                                                             na.rm = T))
@@ -459,7 +464,7 @@ my_cv_MRF_diag <- function (data, symmetrise, n_nodes, n_cores, sample_seed, n_f
                                       Rsquared <- vector()
                                       MSE <- vector()
                                       for (i in seq_len(ncol(predictions))) {
-                                        Rsquared[i] <- cor.test(test_data[, i], 
+                                        Rsquared[i] <- cor.test(unlist(test_data[, i]), 
                                                                 predictions[, i])[[4]]
                                         MSE[i] <- mean((test_data[, i] - predictions[, 
                                                                                      i])^2)
@@ -505,7 +510,6 @@ my_cv_MRF_diag <- function (data, symmetrise, n_nodes, n_cores, sample_seed, n_f
         preds_log <- log(test_data[, i]/predictions[, 
                                                     i])
         preds_log[is.infinite(preds_log)] <- 0
-        preds_log[is.nan(preds_log)] <- 0
         test_data_wzeros <- test_data
         test_data_wzeros[predictions[, i] == 0, i] <- 0
         Deviance[i] <- mean(2 * sum(test_data_wzeros[, 
@@ -530,7 +534,6 @@ my_cv_MRF_diag <- function (data, symmetrise, n_nodes, n_cores, sample_seed, n_f
                                         preds_log <- log(test_data[, i]/predictions[, 
                                                                                     i])
                                         preds_log[is.infinite(preds_log)] <- 0
-                                        preds_log[is.nan(preds_log)] <- 0
                                         test_data_wzeros <- test_data
                                         test_data_wzeros[predictions[, i] == 0, 
                                                          i] <- 0
@@ -572,7 +575,8 @@ my_cv_MRF_diag <- function (data, symmetrise, n_nodes, n_cores, sample_seed, n_f
   }
 }
 
-my_cv_MRF_diag_rep <- function (data, symmetrise, n_nodes, n_cores, sample_seed, n_folds, 
+
+cv_MRF_diag_rep_spatial <- function (data, symmetrise, coords, n_nodes, n_cores, sample_seed, n_folds, 
                                 n_fold_runs, n_covariates, compare_null, family, plot = TRUE) 
 {
   if (!(family %in% c("gaussian", "poisson", "binomial"))) 
@@ -666,38 +670,38 @@ my_cv_MRF_diag_rep <- function (data, symmetrise, n_nodes, n_cores, sample_seed,
   cat("Generating node-optimised Conditional Random Fields model", 
       "\n", sep = "")
   if (family == "binomial") {
-    invisible(utils::capture.output(mrf <- MRFcov(data = data, 
-                                                  symmetrise = symmetrise, n_nodes = n_nodes, n_cores = n_cores, 
-                                                  family = "binomial")))
+    invisible(utils::capture.output(mrf <- MRFcov_spatial(data = data, 
+                                                          symmetrise = symmetrise, n_nodes = n_nodes, n_cores = n_cores, 
+                                                          family = "binomial")))
     if (compare_null) {
       cat("\nGenerating Markov Random Fields model (no covariates)", 
           "\n", sep = "")
-      invisible(utils::capture.output(mrf_null <- MRFcov(data = data[, 
-                                                                     1:n_nodes], symmetrise = symmetrise, n_nodes = n_nodes, 
+      invisible(utils::capture.output(mrf_null <- MRFcov_spatial(data = data[, 1:n_nodes], coords = coords,
+                                                                 symmetrise = symmetrise, n_nodes = n_nodes, 
                                                          n_cores = n_cores, family = "binomial")))
     }
   }
   if (family == "poisson") {
-    invisible(utils::capture.output(mrf <- MRFcov(data = data, 
+    invisible(utils::capture.output(mrf <- MRFcov_spatial(data = data, coords = coords,
                                                   symmetrise = symmetrise, n_nodes = n_nodes, n_cores = n_cores, 
                                                   family = "poisson")))
     if (compare_null) {
       cat("\nGenerating Markov Random Fields model (no covariates)", 
           "\n", sep = "")
-      invisible(utils::capture.output(mrf_null <- MRFcov(data = data[, 
-                                                                     1:n_nodes], symmetrise = symmetrise, n_nodes = n_nodes, 
+      invisible(utils::capture.output(mrf_null <- MRFcov_spatial(data = data[,1:n_nodes], coords = coords,
+                                                                 symmetrise = symmetrise, n_nodes = n_nodes, 
                                                          n_cores = n_cores, family = "poisson")))
     }
   }
   if (family == "gaussian") {
-    invisible(utils::capture.output(mrf <- MRFcov(data = data, 
+    invisible(utils::capture.output(mrf <- MRFcov_spatial(data = data, coords = coords,
                                                   symmetrise = symmetrise, n_nodes = n_nodes, n_cores = n_cores, 
                                                   family = "gaussian")))
     if (compare_null) {
       cat("\nGenerating Markov Random Fields model (no covariates)", 
           "\n", sep = "")
-      invisible(utils::capture.output(mrf_null <- MRFcov(data = data[, 
-                                                                     1:n_nodes], symmetrise = symmetrise, n_nodes = n_nodes, 
+      invisible(utils::capture.output(mrf_null <- MRFcov_spatial(data = data[,1:n_nodes], coords = coords,
+                                                         symmetrise = symmetrise, n_nodes = n_nodes, 
                                                          n_cores = n_cores, family = "gaussian")))
     }
   }
@@ -720,7 +724,7 @@ my_cv_MRF_diag_rep <- function (data, symmetrise, n_nodes, n_cores, sample_seed,
   repped_cvs <- lapply(seq_len(n_fold_runs), function(x) {
     cat("Processing cross-validation run ", x, " of ", n_fold_runs, 
         " ...\n", sep = "")
-    my_cv_MRF_diag(data = data, n_nodes = n_nodes, n_folds = n_folds, 
+    cv_MRF_diag_spatial(data = data, coords = coords, n_nodes = n_nodes, n_folds = n_folds, 
                    n_cores = n_cores, family = family, compare_null = compare_null, 
                    plot = FALSE, cached_model = cached_model, cached_predictions = cached_predictions, 
                    sample_seed = sample_seed)
@@ -741,4 +745,3 @@ my_cv_MRF_diag_rep <- function (data, symmetrise, n_nodes, n_cores, sample_seed,
     return(plot_dat)
   }
 }
-
