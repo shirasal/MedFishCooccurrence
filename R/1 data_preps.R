@@ -84,3 +84,37 @@ herb_mat <- create_spp_mat(dataset = med_clean_east, guild = herbivores, metric 
 write_rds(grps_mat, "data/processed/grps_mat.rds")
 write_rds(dip_mat, "data/processed/dip_mat.rds")
 write_rds(herb_mat, "data/processed/herb_mat.rds")
+
+
+# Data checks -------------------------------------------------------------
+
+## Min, median and max temperatures included:
+
+# Groupers
+med_clean %>%
+  filter(species %in% groupers) %>% 
+  pivot_wider(names_from = species, values_from = biomass, values_fn = sum, values_fill = 0) %>% 
+  select(all_of(groupers), all_of(all_covs)) %>% 
+  summarise(min_temp = min(temp),
+            med_temp = median(temp),
+            max_temp = max(temp))
+
+# Seabreams
+med_clean %>%
+  filter(species %in% diplodus) %>% 
+  pivot_wider(names_from = species, values_from = biomass, values_fn = sum, values_fill = 0) %>% 
+  select(all_of(diplodus), all_of(all_covs)) %>% 
+  summarise(min_temp = min(temp),
+            med_temp = median(temp),
+            max_temp = max(temp))
+
+# Herbiores
+med_clean_east %>%
+  filter(species %in% herbivores) %>% 
+  pivot_wider(names_from = species, values_from = biomass, values_fn = sum, values_fill = 0) %>% 
+  select(all_of(herbivores), all_of(all_covs)) %>% 
+  summarise(min_temp = min(temp),
+            med_temp = median(temp),
+            max_temp = max(temp))
+
+
