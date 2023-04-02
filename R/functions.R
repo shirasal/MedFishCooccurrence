@@ -69,7 +69,7 @@ create_netgraph = function(matrix, node_names, cutoff, predictor_value){
   igraph::V(comm.net)$label <- str_replace(node_names, ".*\\.", paste0(substr(node_names, start = 1, stop = 1), ". "))
   
   # Create the network plot
-  graphics::par(mar = c(0, 2, 0, 2))
+  graphics::par(mar = c(0, 3, 0, 3))
   net.plot <- plot(comm.net,
                    layout = igraph::layout.circle,
                    vertex.label.cex = 1.6,
