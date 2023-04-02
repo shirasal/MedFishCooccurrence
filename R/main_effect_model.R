@@ -67,7 +67,7 @@ herb_prepped_dat <- herb_prepped_dat %>%
   mutate(across(.cols = 9:ncol(herb_prepped_dat), .fns = function(x) 0))
 
 # Re-fit the model, setting prep_covariates to FALSE
-herb_no_int <- MRFcov_spatial(dip_prepped_dat, coords = coord_dfs$dip, 
+herb_no_int <- MRFcov_spatial(herb_prepped_dat, coords = coord_dfs$herb, 
                               n_nodes = 4, prep_covariates = F, family = "gaussian")
 herb_no_int$graph
 herb_no_int$direct_coefs
