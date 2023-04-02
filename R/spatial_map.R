@@ -40,6 +40,7 @@ med_clean %>%
                      labels = c("Not protected", "Protected"), name = "Locations") +
   scale_colour_manual(values = c("#59a648", "#6948a6"), 
                      labels = c("Not protected", "Protected"), name = "Locations") +
+  guides(colour = guide_legend(override.aes = list(alpha = 1))) + 
   coord_quickmap() + 
   theme_bw() +
   theme(text = element_text(size = 16),
