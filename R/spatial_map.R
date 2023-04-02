@@ -32,15 +32,17 @@ med_clean %>%
   ggplot() +
   aes(y = Latitude, x = Longitude) + 
   stat_contour(data = med_bathy_df, aes(z = Bathymetry), col = "lightgray") +
-  geom_raster(data = med_temp_df, aes(fill = Temperature), alpha = .5) +
-  scale_fill_gradientn(colours = c("#313695", "#ffffbf", "#a50026"), name = "Temperature °C") +
+  geom_raster(data = med_temp_df, aes(fill = Temperature), alpha = .7) +
+  scale_fill_gradient2(low = "#03538A", mid = "#EFE181", high = "#A02005", midpoint = 19.5, name = "Temperature °C") +
   # stat_sum(data = med_clean, aes(x = lon, y = lat, shape = mpa), alpha = .5) +
-  geom_point(aes(x = lon, y = lat, shape = mpa), size = 3, alpha = .5) + 
+  geom_point(aes(x = lon, y = lat, shape = mpa, col = mpa), size = 3, alpha = .5) + 
   scale_shape_manual(values = c(4, 18), 
+                     labels = c("Not protected", "Protected"), name = "Locations") +
+  scale_colour_manual(values = c("#59a648", "#6948a6"), 
                      labels = c("Not protected", "Protected"), name = "Locations") +
   coord_quickmap() + 
   theme_bw() +
-  theme(text = element_text(size = 14),
+  theme(text = element_text(size = 16),
         axis.title.y = element_text(angle = 90),
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
